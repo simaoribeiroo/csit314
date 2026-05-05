@@ -1,8 +1,8 @@
 :root {
-  color: #f8fafc;
+  color: #111827;
   background:
-    radial-gradient(circle at top, rgba(255, 202, 128, 0.18), transparent 28%),
-    linear-gradient(180deg, #09111f 0%, #060a13 100%);
+    radial-gradient(circle at top, rgba(59, 130, 246, 0.08), transparent 28%),
+    linear-gradient(180deg, #ffffff 0%, #f3f4f6 100%);
   font-family:
     Inter,
     'Segoe UI',
