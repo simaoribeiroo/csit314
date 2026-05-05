@@ -1,8 +1,6 @@
 :root {
-  color: #111827;
-  background:
-    radial-gradient(circle at top, rgba(59, 130, 246, 0.08), transparent 28%),
-    linear-gradient(180deg, #ffffff 0%, #f3f4f6 100%);
+  color: var(--primary);
+  background-color:var(--bg);
   font-family:
     Inter,
     'Segoe UI',
@@ -14,6 +12,12 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --primary:#00014D;
+  --secondary:#009DFF;
+  --tertiary:#FFFFFF;
+  --bg:#EEF8FF;
+  --transluscent:#00014d5b; 
 }
 
 * {

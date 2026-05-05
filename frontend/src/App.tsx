@@ -1,40 +1,58 @@
-import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import './App.css'
-import Banner from './components/Banner'
-import CreateCandidatePage from './pages/CreateCandidatePage'
-import CreateEmployerPage from './pages/CreateEmployerPage'
-import LoginPage from './pages/LoginPage'
-import ProfilePage from './pages/ProfilePage'
-import SearchCandidatesPage from './pages/SearchCandidatesPage'
-import SearchJobsPage from './pages/SearchJobsPage'
+import { Layout } from './pages/Layout'
+import { UserProvider } from './providers/UserProvider'
+import { CreateCandidatePage } from './pages/CreateCandidatePage';
+import { CreateEmployerPage } from './pages/CreateEmployerPage';
+import { LoginPage } from './pages/LoginPage';
+import { ProfilePage } from './pages/ProfilePage';
+import { SearchCandidatesPage } from './pages/SearchCandidatesPage';
+import { SearchJobsPage } from './pages/SearchJobsPage';
 
-function AppShell() {
-  return (
-    <div className="app-shell">
-      <div className="app-content">
-        <Outlet />
-      </div>
-    </div>
-  )
-}
+const router = createBrowserRouter([
+	{
+		path: "/",
+		Component: Layout,
+		children: [
+			{
+				index: true,
+				element: <Navigate to="/search-jobs" replace/>,
+			},
+			{
+				path: "/login",
+				Component: LoginPage,
+			},
+			{
+				path:"/profile",
+				Component:ProfilePage
+			},
+			{
+				path:"/create-candidate",
+				Component:CreateCandidatePage
+			},
+			{
+				path:"/create-employer",
+				Component:CreateEmployerPage
+			},
+			{
+				path:"/search-jobs",
+				Component:SearchJobsPage
+			},
+			{
+				path:"/search-candidates",
+				Component:SearchCandidatesPage
+			},
+		]
+	}
+]);
 
 function App() {
-  return (
-    <>
-      <Banner />
-      <Routes>
-        <Route path="login" element={<LoginPage />} />
-        <Route element={<AppShell />}>
-          <Route index element={<Navigate to="/search-jobs" replace />} />
-          <Route path="profile" element={<ProfilePage />} />
-          <Route path="create-candidate" element={<CreateCandidatePage />} />
-          <Route path="create-employer" element={<CreateEmployerPage />} />
-          <Route path="search-jobs" element={<SearchJobsPage />} />
-          <Route path="search-candidates" element={<SearchCandidatesPage />} />
-        </Route>
-      </Routes>
-    </>
-  )
+
+	return (
+		<UserProvider>
+			<RouterProvider router={router} />
+		</UserProvider>
+	)
 }
 
 export default App

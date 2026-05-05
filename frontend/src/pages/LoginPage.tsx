@@ -1,7 +1,7 @@
 import LoginForm from '../components/LoginForm'
+import { FC } from "react";
+interface ILoginPageProps {};
 
-function LoginPage() {
-  return <LoginForm />
+export const LoginPage: FC<ILoginPageProps> = (_) => {
+    return <LoginForm />
 }
-
-export default LoginPage
