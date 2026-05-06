@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage'
 import ProfilePage from './pages/ProfilePage'
 import SearchCandidatesPage from './pages/SearchCandidatesPage'
 import SearchJobsPage from './pages/SearchJobsPage'
+import HomePage from './pages/HomePage'
 
 function AppShell() {
   return (
@@ -25,7 +26,7 @@ function App() {
       <Routes>
         <Route path="login" element={<LoginPage />} />
         <Route element={<AppShell />}>
-          <Route index element={<Navigate to="/search-jobs" replace />} />
+          <Route index element={<HomePage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="create-candidate" element={<CreateCandidatePage />} />
           <Route path="create-employer" element={<CreateEmployerPage />} />
