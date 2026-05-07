@@ -335,6 +335,10 @@
   box-shadow: 0 28px 90px rgba(59, 130, 246, 0.08);
 }
 
+.employer-card {
+  max-width: 640px;
+}
+
 .login-title {
   text-align: center;
   font-size: 1.75rem;
@@ -359,7 +363,8 @@
   font-weight: 500;
 }
 
-.form-group input {
+.form-group input,
+.form-group textarea {
   width: 100%;
   box-sizing: border-box;
   border-radius: 12px;
@@ -371,14 +376,21 @@
   transition: all 160ms ease;
 }
 
-.form-group input::placeholder {
+.form-group input::placeholder,
+.form-group textarea::placeholder {
   color: #9ca3af;
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group textarea:focus {
   outline: none;
   border-color: rgba(59, 130, 246, 0.5);
   background: #ffffff;
+}
+
+.form-group textarea {
+  min-height: 108px;
+  resize: vertical;
 }
 
 .password-input-wrapper {

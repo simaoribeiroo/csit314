@@ -1,8 +1,8 @@
-import { FC } from "react";
-interface ICreateEmployerPageProps {};
+import { type FC } from 'react'
+import CreateEmployerForm from '../components/CreateEmployerForm'
 
-export const CreateEmployerPage: FC<ICreateEmployerPageProps> = (_) => {
-    return (
-        <>Create Employer Page</>
-    );
+interface ICreateEmployerPageProps {}
+
+export const CreateEmployerPage: FC<ICreateEmployerPageProps> = () => {
+  return <CreateEmployerForm />
 }
