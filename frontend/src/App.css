@@ -254,7 +254,8 @@
   .panel-form.two-column,
   .panel-grid,
   .result-list,
-  .search-toolbar {
+  .search-toolbar,
+  .candidate-grid.two-column {
     grid-template-columns: 1fr;
   }
 }
@@ -339,6 +340,10 @@
   max-width: 640px;
 }
 
+.candidate-card {
+  max-width: 760px;
+}
+
 .login-title {
   text-align: center;
   font-size: 1.75rem;
@@ -350,6 +355,19 @@
 .login-form {
   display: grid;
   gap: 20px;
+}
+
+.candidate-form {
+  gap: 18px;
+}
+
+.candidate-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.candidate-grid.two-column {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .form-group {

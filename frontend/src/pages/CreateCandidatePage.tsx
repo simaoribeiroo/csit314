@@ -1,8 +1,8 @@
-import { FC } from "react";
-interface ICreateCandidatePageProps {};
+import { type FC } from 'react'
+import CreateCandidateForm from '../components/CreateCandidateForm'
 
-export const CreateCandidatePage: FC<ICreateCandidatePageProps> = (_) => {
-    return (
-        <>Create Candidate Page</>
-    );
+interface ICreateCandidatePageProps {}
+
+export const CreateCandidatePage: FC<ICreateCandidatePageProps> = () => {
+    return <CreateCandidateForm />
 }
