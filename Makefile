@@ -18,5 +18,5 @@ unit:
 	PYTHONPATH=backend python -m unittest discover -s tests/unit -p "test_*.py"
 
 e2e:
-	npm --prefix tests/e2e ci
+	npm --prefix tests/e2e install
 	npm --prefix tests/e2e test
