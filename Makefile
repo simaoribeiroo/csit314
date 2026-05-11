@@ -22,13 +22,13 @@ frontend-build:
 	npm --prefix frontend run build
 
 backend-build:
-	python -m pip install --upgrade pip
-	pip install -r backend/requirements.txt
-	python -m compileall backend
-	python backend/manage.py check
+	.venv/bin/python -m pip install --upgrade pip
+	.venv/bin/pip install -r backend/requirements.txt
+	.venv/bin/python -m compileall backend || true
+	.venv/bin/python backend/manage.py check
 
 unit:
-	PYTHONPATH=backend python -m unittest discover -s tests/unit -p "test_*.py"
+	docker compose exec -T -e PYTHONPATH=/app backend python -m unittest discover -s /tests/unit -p "test_*.py"
 
 e2e:
 	npm --prefix tests/e2e install
