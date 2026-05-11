@@ -1,0 +1,150 @@
+[
+  {
+    "model": "database.account",
+    "pk": "candidate1@example.com",
+    "fields": {
+      "password": "candidatepass123",
+      "account_type": "candidate"
+    }
+  },
+  {
+    "model": "database.account",
+    "pk": "company1@example.com",
+    "fields": {
+      "password": "companypass123",
+      "account_type": "company"
+    }
+  },
+  {
+    "model": "database.account",
+    "pk": "candidate2@example.com",
+    "fields": {
+      "password": "candidatepass456",
+      "account_type": "candidate"
+    }
+  },
+  {
+    "model": "database.account",
+    "pk": "company2@example.com",
+    "fields": {
+      "password": "companypass456",
+      "account_type": "company"
+    }
+  },
+  {
+    "model": "database.candidate",
+    "pk": "candidate1@example.com",
+    "fields": {
+      "full_name": "Ava Tan",
+      "phone_number": "+65 9123 4567",
+      "university": "National University of Singapore",
+      "degree_name": "Computer Science",
+      "years_of_experience": 2,
+      "skills": "Python,Django,SQL,Git",
+      "preferred_working_mode": "Hybrid",
+      "preferred_location": "Singapore"
+    }
+  },
+  {
+    "model": "database.candidate",
+    "pk": "candidate2@example.com",
+    "fields": {
+      "full_name": "Rafael Costa",
+      "phone_number": "+65 9888 1122",
+      "university": "Singapore Management University",
+      "degree_name": "Information Systems",
+      "years_of_experience": 4,
+      "skills": "JavaScript,React,Node.js,PostgreSQL",
+      "preferred_working_mode": "Remote",
+      "preferred_location": "Singapore"
+    }
+  },
+  {
+    "model": "database.candidate",
+    "pk": "candidate3@example.com",
+    "fields": {
+      "full_name": "Mei Lin Ng",
+      "phone_number": "+65 9777 3344",
+      "university": "Nanyang Technological University",
+      "degree_name": "Software Engineering",
+      "years_of_experience": 1,
+      "skills": "Java,Spring Boot,REST APIs,Docker",
+      "preferred_working_mode": "On-site",
+      "preferred_location": "Singapore"
+    }
+  },
+  {
+    "model": "database.company",
+    "pk": "company1@example.com",
+    "fields": {
+      "company_name": "TechCorp",
+      "company_information": "A product-focused software company building internal tools and customer-facing platforms.",
+      "contact_information": "+65 6000 1111"
+    }
+  },
+  {
+    "model": "database.company",
+    "pk": "company2@example.com",
+    "fields": {
+      "company_name": "GreenWave Solutions",
+      "company_information": "A consulting firm specializing in cloud migration, data engineering, and web applications.",
+      "contact_information": "+65 6000 2222"
+    }
+  },
+  {
+    "model": "database.jobposting",
+    "pk": 1,
+    "fields": {
+      "company_email": "company1@example.com",
+      "job_title": "Junior Backend Developer",
+      "description": "Build and maintain REST APIs, work with relational databases, and support deployment pipelines.",
+      "work_mode": "Hybrid",
+      "required_yoe": 1,
+      "required_skills": "Python,Django,PostgreSQL,REST",
+      "required_degree": "Computer Science",
+      "location": "Singapore"
+    }
+  },
+  {
+    "model": "database.jobposting",
+    "pk": 2,
+    "fields": {
+      "company_email": "company1@example.com",
+      "job_title": "Frontend Engineer",
+      "description": "Develop responsive interfaces, collaborate with designers, and maintain reusable components.",
+      "work_mode": "Remote",
+      "required_yoe": 2,
+      "required_skills": "JavaScript,React,CSS,TypeScript",
+      "required_degree": "Information Systems",
+      "location": "Singapore"
+    }
+  },
+  {
+    "model": "database.jobposting",
+    "pk": 3,
+    "fields": {
+      "company_email": "company2@example.com",
+      "job_title": "Data Engineer",
+      "description": "Design data pipelines, optimize warehouse models, and support analytics workflows.",
+      "work_mode": "On-site",
+      "required_yoe": 3,
+      "required_skills": "SQL,Python,Airflow,ETL",
+      "required_degree": "Software Engineering",
+      "location": "Singapore"
+    }
+  },
+  {
+    "model": "database.jobposting",
+    "pk": 4,
+    "fields": {
+      "company_email": "company2@example.com",
+      "job_title": "Cloud Support Associate",
+      "description": "Support cloud-hosted applications, troubleshoot issues, and document operational processes.",
+      "work_mode": "Hybrid",
+      "required_yoe": 1,
+      "required_skills": "Linux,AWS,Networking,Scripting",
+      "required_degree": "Computer Engineering",
+      "location": "Singapore"
+    }
+  }
+]
