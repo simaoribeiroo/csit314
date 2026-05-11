@@ -1,0 +1,11 @@
+{
+  "name": "csit314-e2e",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node run-all.js"
+  },
+  "dependencies": {
+    "puppeteer": "^21.0.0"
+  }
+}
