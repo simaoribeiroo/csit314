@@ -182,7 +182,9 @@
 }
 
 .panel-form button,
-.search-toolbar button {
+.search-toolbar button,
+.home-actions button,
+.home-card button {
   border: 0;
   border-radius: 16px;
   background: linear-gradient(135deg, #2563eb, #1e40af);
@@ -196,8 +198,12 @@
 
 .panel-form button:hover,
 .search-toolbar button:hover,
+.home-actions button:hover,
+.home-card button:hover,
 .panel-form button:focus-visible,
-.search-toolbar button:focus-visible {
+.search-toolbar button:focus-visible,
+.home-actions button:focus-visible,
+.home-card button:focus-visible {
   transform: translateY(-1px);
   box-shadow: 0 18px 30px rgba(59, 130, 246, 0.3);
 }

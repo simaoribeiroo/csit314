@@ -11,10 +11,16 @@ function HomePage() {
       description="Find suitable jobs or candidates using profile details, job descriptions, searching, filtering, and recommendation matching."
     >
       <div className="home-actions">
-        <button type="button" onClick={() => navigate('/create-candidate')}>
+        <button
+          type="button"
+          onClick={() => navigate('/create-candidate')}
+        >
           Create candidate account
         </button>
-        <button type="button" onClick={() => navigate('/create-employer')}>
+        <button
+          type="button"
+          onClick={() => navigate('/create-employer')}
+        >
           Create company account
         </button>
       </div>
