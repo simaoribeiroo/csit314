@@ -2,14 +2,17 @@ services:
   backend:
     build: ./backend
     ports:
-      - "8001:8000"
+      - "8001:8001"
     volumes:
       - ./backend:/app
+      - ./tests:/tests
 
   frontend:
     build: ./frontend
     ports:
       - "5173:5173"
+    environment:
+      VITE_API_TARGET: http://backend:8001
     volumes:
       - ./frontend:/app
       - /app/node_modules

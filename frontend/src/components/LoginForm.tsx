@@ -1,18 +1,54 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useUserState } from '../providers/UserProvider'
 
 function LoginForm() {
   const navigate = useNavigate()
+  const userState = useUserState()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: Add account type detection logic here
-    // For now, redirect to search-jobs
-    console.log('Login attempt:', { email, password })
-    navigate('/search-jobs')
+    setError('')
+
+    try {
+      const response = await fetch('/api/login/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.error ?? 'Login failed')
+        return
+      }
+
+      userState.setUser({
+        email: data.email,
+        accountType: data.account_type,
+      })
+
+      if (data.account_type === 'candidate') {
+        navigate('/search-jobs')
+        return
+      }
+
+      if (data.account_type === 'company') {
+        navigate('/search-candidates')
+        return
+      }
+
+      navigate('/profile')
+    } catch {
+      setError('Unable to reach the login service')
+    }
   }
 
   return (
@@ -21,6 +57,7 @@ function LoginForm() {
         <h2 className="login-title">Login</h2>
         
         <form onSubmit={handleSubmit} className="login-form">
+          {error ? <p className="login-error" role="alert">{error}</p> : null}
           <div className="form-group">
             <label htmlFor="email">Email</label>
             <input

@@ -3,6 +3,8 @@ interface IUserProviderProps {
     children: ReactNode,
 };
 export interface IUser {
+    email: string;
+    accountType: string;
 
 }
 interface IUserProviderInfo {
@@ -13,7 +15,7 @@ interface IUserProviderInfo {
 const UserContext = createContext<IUserProviderInfo | null>(null);
 
 export const UserProvider: FC<IUserProviderProps> = (props) => {
-    const user = useRef<IUser>(undefined);
+    const user = useRef<IUser | undefined>(undefined);
 
     return (
         <UserContext.Provider value={{
