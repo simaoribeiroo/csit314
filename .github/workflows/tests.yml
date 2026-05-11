@@ -31,5 +31,8 @@ jobs:
           cache: pip
           cache-dependency-path: backend/requirements.txt
 
+      - name: Create Python virtual environment
+        run: python -m venv .venv
+
       - name: Run tests
         run: make test
