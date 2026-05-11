@@ -18,6 +18,8 @@
   --tertiary:#FFFFFF;
   --bg:#EEF8FF;
   --transluscent:#00014d5b; 
+  --danger:#9e0000;
+  --transition:0.2s;
 }
 
 * {

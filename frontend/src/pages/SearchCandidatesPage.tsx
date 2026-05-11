@@ -3,6 +3,8 @@ interface ISearchCandidatesPageProps {};
 
 export const SearchCandidatesPage: FC<ISearchCandidatesPageProps> = (_) => {
     return (
-    <>Search Candidates</>
+    <div className="conatiner">
+      
+    </div>
   );
 }
