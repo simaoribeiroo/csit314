@@ -15,7 +15,7 @@ interface IJobPosting {
 	workMode: string;
 	location: string;
 	contactEmail: string;
-	yearsOfExperience?: number;
+	yoe: number;
 	skills: string[];
 	degree: string;
 }
@@ -80,7 +80,7 @@ const JobDetailModal = forwardRef<IJobDetailModalHandle, IJobDetailModalProps>((
 
 					<section className={styles.modalSection}>
 						<h3 className={styles.sectionTitle}>Required YOE</h3>
-						<p className={styles.sectionText}>{job.yearsOfExperience}</p>
+						<p className={styles.sectionText}>{job.yoe}</p>
 					</section>
 
 					<section className={styles.modalSection}>
@@ -154,6 +154,10 @@ const FilterPopup = forwardRef<IFilterPopupHandle, FilterPopupProps>((props, ref
 	const addSkill = (e: React.SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		const data = Object.fromEntries(new FormData(e.currentTarget)) as any;
+		if (data.skill == "") {
+			skillInput.current?.setError("Skill can't be empty.");
+			return;
+		}
 		if (filters.skills.includes(data.skill)) {
 			skillInput.current?.setError("This skill has already been added.");
 			return;
@@ -280,7 +284,7 @@ export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 			workMode: "Hybrid",
 			location: "Sydney, Australia",
 			contactEmail: "example@email.com",
-			yearsOfExperience: 5,
+			yoe: 5,
 			skills: ["React", "Tailwind", "HTML/CSS", "Typescript"],
 			degree: "Bachelor of Computer Science",
 		},
@@ -293,7 +297,8 @@ export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 			location: "Location",
 			contactEmail: "",
 			skills: [],
-			degree: ""
+			degree: "",
+			yoe: 0
 		},
 		{
 			id: 3,
@@ -304,7 +309,8 @@ export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 			location: "Location",
 			contactEmail: "",
 			skills: [],
-			degree: ""
+			degree: "",
+			yoe: 0
 		},
 		{
 			id: 4,
@@ -315,7 +321,8 @@ export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 			location: "Location",
 			contactEmail: "",
 			skills: [],
-			degree: ""
+			degree: "",
+			yoe: 0
 		},
 	]);
 	const jobDetailModal = useRef<IJobDetailModalHandle>(null);
