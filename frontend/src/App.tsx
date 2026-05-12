@@ -8,6 +8,7 @@ import { LoginPage } from './pages/LoginPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { SearchCandidatesPage } from './pages/SearchCandidatesPage';
 import { SearchJobsPage } from './pages/SearchJobsPage';
+import LandingPage from './pages/LandingPage';
 
 const router = createBrowserRouter([
 	{
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
 			{
 				path: "/login",
 				Component: LoginPage,
+			},
+			{
+				path: "/LandingPage",
+				Component: LandingPage,
 			},
 			{
 				path:"/profile",

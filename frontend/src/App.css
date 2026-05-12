@@ -370,6 +370,15 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.home-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.home-card .login-button {
+  margin-top: auto;
+}
+
 .form-group {
   display: grid;
   gap: 8px;
