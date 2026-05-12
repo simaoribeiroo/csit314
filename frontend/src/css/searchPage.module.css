@@ -292,3 +292,47 @@
     border-color: #0099ff;
     box-shadow: 0 0 4px rgba(0, 153, 255, 0.2);
 }
+
+.filterControls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.recommendedSection {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left:auto;
+}
+
+.recommendedLabel {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.jobTitleDropdown {
+    padding: 6px 12px;
+    border: 1px solid var(--primary);
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: var(--tertiary);
+    color: var(--primary-text);
+    cursor: pointer;
+    outline: none;
+    transition: var(--transition);
+}
+
+.jobTitleDropdown:hover {
+    border-color: var(--secondary);
+}
+
+.jobTitleDropdown:focus {
+    border-color: var(--secondary);
+}
+
+.jobTitleDropdown option {
+    background-color: var(--tertiary);
+}
