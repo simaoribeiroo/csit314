@@ -8,6 +8,8 @@ import { LoginPage } from './pages/LoginPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { SearchCandidatesPage } from './pages/SearchCandidatesPage';
 import { SearchJobsPage } from './pages/SearchJobsPage';
+import CompanyProfilePage from './pages/CompanyProfilePage';
+import CandidateProfilePage from './pages/CandidateProfilePage';
 
 const router = createBrowserRouter([
 	{
@@ -42,6 +44,14 @@ const router = createBrowserRouter([
 				path:"/search-candidates",
 				Component:SearchCandidatesPage
 			},
+			{
+				path:"/company-profile",
+				Component:CompanyProfilePage
+			},
+			{
+				path:"/candidate-profile",
+				Component:CandidateProfilePage
+			}
 		]
 	}
 ]);
