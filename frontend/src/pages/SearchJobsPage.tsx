@@ -1,9 +1,21 @@
-import { FC, forwardRef, useImperativeHandle, useRef, useState } from "react";
+import { FC, forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import styles from "../css/searchPage.module.css";
 import buttonStyles from "../css/baseButton.module.css";
 import { InputField, InputFieldHandle } from "../components/InputField";
 import { BaseButton } from "../components/BaseButton";
 import { Cross, Plus, Search } from "../components/Icons";
+
+type RecommendedJob = {
+  job_title: string;
+  company_name: string;
+  description: string;
+  work_mode: string;
+  required_yoe: number;
+  required_skills: string;
+  required_degree: string;
+  location: string;
+  score: number;
+};
 
 interface ISearchJobsPageProps { }
 
@@ -274,57 +286,7 @@ const FilterPopup = forwardRef<IFilterPopupHandle, FilterPopupProps>((props, ref
 });
 
 export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
-	const [jobs, setJobs] = useState<IJobPosting[]>([
-		{
-			id: 1,
-			title: "Job title 1",
-			company: "Company name",
-			description:
-				"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec consectetur libero tortor, ut lacinia dui tristique nec. Pellentesque sed lorem ut mauris facilisis aliquet. Vestibulum porttitor neque felis, in interdum leo efficitur sit amet. Sed efficitur consectetur turpis, eu lacinia eros maximus vel. Morbi orci nunc, sollicitudin sit amet egestas ac, ornare nec sem.",
-			workMode: "Hybrid",
-			location: "Sydney, Australia",
-			contactEmail: "example@email.com",
-			yoe: 5,
-			skills: ["React", "Tailwind", "HTML/CSS", "Typescript"],
-			degree: "Bachelor of Computer Science",
-		},
-		{
-			id: 2,
-			title: "Job title 2",
-			company: "Company name",
-			description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec consectetur libero tortor, ut lacinia dui tristique nec. Pellentesque sed lorem ut mauris facilisis aliquet. Vestibulum...",
-			workMode: "Work mode",
-			location: "Location",
-			contactEmail: "",
-			skills: [],
-			degree: "",
-			yoe: 0
-		},
-		{
-			id: 3,
-			title: "Job title 3",
-			company: "Company name",
-			description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec consectetur libero tortor, ut lacinia dui tristique nec. Pellentesque sed lorem ut mauris facilisis aliquet. Vestibulum...",
-			workMode: "Work mode",
-			location: "Location",
-			contactEmail: "",
-			skills: [],
-			degree: "",
-			yoe: 0
-		},
-		{
-			id: 4,
-			title: "Job title 4",
-			company: "Company name",
-			description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec consectetur libero tortor, ut lacinia dui tristique nec. Pellentesque sed lorem ut mauris facilisis aliquet. Vestibulum...",
-			workMode: "Work mode",
-			location: "Location",
-			contactEmail: "",
-			skills: [],
-			degree: "",
-			yoe: 0
-		},
-	]);
+	const [jobs, setJobs] = useState<IJobPosting[]>([]);
 	const jobDetailModal = useRef<IJobDetailModalHandle>(null);
 	const filtersModal = useRef<IFilterPopupHandle>(null);
 	const [searchQuery, setSearchQuery] = useState("");
@@ -334,10 +296,36 @@ export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 		skills: [],
 		location: ""
 	})
+	useEffect(() => {
+		fetch("http://127.0.0.1:8000/api/recommendations/jobs/?email=george@test.com")
+			.then((response) => response.json())
+			.then((data) => {
+			const apiJobs: IJobPosting[] = (data.recommended_jobs || []).map(
+				(job: RecommendedJob, index: number) => ({
+				id: index + 1,
+				title: job.job_title,
+				company: job.company_name,
+				description: job.description,
+				workMode: job.work_mode,
+				location: job.location,
+				contactEmail: "",
+				yoe: job.required_yoe,
+				skills: job.required_skills
+					? job.required_skills.split(",").map((skill) => skill.trim())
+					: [],
+				degree: job.required_degree,
+				})
+			);
+
+			setJobs(apiJobs);
+			})
+			.catch((error) => {
+			console.error("Failed to load recommended jobs:", error);
+			});
+		}, []);
 
 	function onSearchChange(value: string) {
 		setSearchQuery(value);
-		setJobs((prev) => prev.filter(v => v.title.toLowerCase().includes(value.toLowerCase())));
 	}
 
 	function onFiltersClose(f: IFilters) {
