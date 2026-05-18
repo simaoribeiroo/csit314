@@ -78,8 +78,7 @@
     "pk": "company1@example.com",
     "fields": {
       "company_name": "TechCorp",
-      "company_information": "A product-focused software company building internal tools and customer-facing platforms.",
-      "contact_information": "+65 6000 1111"
+      "company_information": "A product-focused software company building internal tools and customer-facing platforms."
     }
   },
   {
@@ -87,8 +86,7 @@
     "pk": "company2@example.com",
     "fields": {
       "company_name": "GreenWave Solutions",
-      "company_information": "A consulting firm specializing in cloud migration, data engineering, and web applications.",
-      "contact_information": "+65 6000 2222"
+      "company_information": "A consulting firm specializing in cloud migration, data engineering, and web applications."
     }
   },
   {

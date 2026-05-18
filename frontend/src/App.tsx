@@ -2,6 +2,8 @@ import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import './App.css'
 import { Layout } from './pages/Layout'
 import { UserProvider } from './providers/UserProvider'
+import { CompanyProvider } from './providers/CompanyProvider'
+import { CandidateProvider } from './providers/CandidateProvider'
 import { CreateCandidatePage } from './pages/CreateCandidatePage';
 import { CreateEmployerPage } from './pages/CreateEmployerPage';
 import { LoginPage } from './pages/LoginPage';
@@ -50,7 +52,11 @@ function App() {
 
 	return (
 		<UserProvider>
-			<RouterProvider router={router} />
+			<CompanyProvider>
+				<CandidateProvider>
+					<RouterProvider router={router} />
+				</CandidateProvider>
+			</CompanyProvider>
 		</UserProvider>
 	)
 }

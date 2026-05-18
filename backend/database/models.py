@@ -35,7 +35,6 @@ class Company(models.Model):
     email = models.EmailField(primary_key=True)
     company_name = models.CharField(max_length=255)
     company_information = models.TextField()
-    contact_information = models.CharField(max_length=255)
 
     class Meta:
         db_table = 'Company'
