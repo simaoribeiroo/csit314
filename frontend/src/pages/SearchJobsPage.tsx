@@ -297,7 +297,14 @@ export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 		location: ""
 	})
 	useEffect(() => {
-		fetch("http://127.0.0.1:8000/api/recommendations/jobs/?email=george@test.com")
+		const email = localStorage.getItem('email')
+
+		if (!email) {
+		console.error('No logged-in email found')
+		return
+		}
+
+		fetch(`http://127.0.0.1:8000/api/recommendations/jobs/?email=${email}`)
 			.then((response) => response.json())
 			.then((data) => {
 			const apiJobs: IJobPosting[] = (data.recommended_jobs || []).map(
