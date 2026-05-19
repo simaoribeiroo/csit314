@@ -111,7 +111,7 @@ interface IFilterPopupHandle {
 	getFilters: () => IFilters
 }
 interface IFilters {
-	experience: string[],
+	experience: number[],
 	workMode: string[],
 	skills: string[],
 	location: string,
@@ -133,7 +133,7 @@ const FilterPopup = forwardRef<IFilterPopupHandle, FilterPopupProps>((props, ref
 		setIsOpened(false);
 	}
 
-	const toggleExperience = (exp: string) => {
+	const toggleExperience = (exp: number) => {
 		let nf = { ...filters };
 		if (nf.experience.includes(exp))
 			nf.experience = nf.experience.filter((e) => e !== exp)
@@ -195,12 +195,12 @@ const FilterPopup = forwardRef<IFilterPopupHandle, FilterPopupProps>((props, ref
 				<section className={styles.filterSection}>
 					<h3 className={styles.filterTitle}>Years of Experience</h3>
 					<div className={styles.checkboxGroup}>
-						{["No experience", "1-4 years", "4-7 years", "8+ years"].map((exp) => (
+						{["No experience", "1-4 years", "4-7 years", "8+ years"].map((exp,i) => (
 							<label key={exp} className={styles.checkboxLabel}>
 								<input
 									type="checkbox"
-									checked={filters.experience.includes(exp)}
-									onChange={() => toggleExperience(exp)}
+									checked={filters.experience.includes(i)}
+									onChange={() => toggleExperience(i)}
 									className={styles.checkbox}
 								/>
 								{exp}
@@ -327,21 +327,48 @@ export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 	]);
 	const jobDetailModal = useRef<IJobDetailModalHandle>(null);
 	const filtersModal = useRef<IFilterPopupHandle>(null);
-	const [searchQuery, setSearchQuery] = useState("");
 	const filters = useRef<IFilters>({
 		experience: [],
 		workMode: [],
 		skills: [],
 		location: ""
 	})
+	const searchInput = useRef<string>("");
 
-	function onSearchChange(value: string) {
-		setSearchQuery(value);
-		setJobs((prev) => prev.filter(v => v.title.toLowerCase().includes(value.toLowerCase())));
+	async function performSearch(searchString: string, searchFilters: IFilters) {
+		try {
+			const params = new URLSearchParams();
+			
+			if (searchString) params.append('search', searchString);
+			if (searchFilters.experience.length > 0) params.append('experience', searchFilters.experience.join(','));
+			if (searchFilters.workMode.length > 0) params.append('workMode', searchFilters.workMode.join(','));
+			if (searchFilters.skills.length > 0) params.append('skills', searchFilters.skills.join(','));
+			if (searchFilters.location) params.append('location', searchFilters.location);
+			
+			const response = await fetch(`/api/jobs/search/?${params}`);
+			if (!response.ok) {
+				throw new Error('Failed to search jobs');
+			}
+			
+			const data = await response.json();
+			setJobs(data.jobs || []);
+		} catch (error) {
+			console.error('Search error:', error);
+			setJobs([]);
+		}
+	}
+
+	function onSearch(e:React.SubmitEvent<HTMLFormElement>) {
+		e.preventDefault();
+		const formData = new FormData(e.currentTarget);
+        const data = Object.fromEntries(formData.entries()) as any;
+		searchInput.current = data.search;
+		performSearch(data.search, filters.current);
 	}
 
 	function onFiltersClose(f: IFilters) {
 		filters.current = f;
+		performSearch(searchInput.current, f);
 	}
 
 	return (
@@ -351,16 +378,15 @@ export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 			<div className={styles.container}>
 				<div className={styles.searchSection}>
 					<h1 className={styles.pageTitle}>Search jobs</h1>
-					<div className={styles.searchDiv}>
+					<form onSubmit={onSearch} className={styles.searchDiv}>
 						<InputField
 							type="text"
+							name="search"
 							placeholder="Search..."
 							className={styles.searchInput}
-							onChange={onSearchChange}
-							value={searchQuery}
 						/>
-						<BaseButton className={`${buttonStyles.primaryButton} ${styles.searchButton}`} icon={<Search />} />
-					</div>
+						<BaseButton type="submit" className={`${buttonStyles.primaryButton} ${styles.searchButton}`} icon={<Search />} />
+					</form>
 					<BaseButton
 						className={styles.filtersButton}
 						onClick={() => filtersModal.current?.show(filters.current)}

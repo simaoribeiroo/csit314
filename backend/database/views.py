@@ -4,8 +4,9 @@ from django.http import JsonResponse
 from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
+from django.db.models import Q
 
-from .models import Account, Company, Candidate
+from .models import Account, Company, Candidate, JobPosting
 
 
 
@@ -126,6 +127,81 @@ def register_account(request):
         },
         status=201,
     )
+
+@csrf_exempt
+@require_GET
+def search_jobs(request):
+    try:
+        search_string = request.GET.get("search", "").strip()
+        experience_param = request.GET.get("experience", "")
+        work_mode_param = request.GET.get("workMode", "")
+        skills_param = request.GET.get("skills", "")
+        location_param = request.GET.get("location", "").strip()
+
+        experience_indices = [int(x.strip()) for x in experience_param.split(",") if x.strip().isdigit()]
+        work_modes = [x.strip() for x in work_mode_param.split(",") if x.strip()]
+        required_skills = [x.strip() for x in skills_param.split(",") if x.strip()]
+        
+        jobs = JobPosting.objects.all()
+        
+        if search_string:
+            jobs = jobs.filter(
+                Q(job_title__icontains=search_string) |
+                Q(description__icontains=search_string)
+            )
+        
+        if experience_indices:
+            experience_q = Q()
+            for exp_idx in experience_indices:
+                if exp_idx == 0:
+                    experience_q |= Q(required_yoe=0)
+                elif exp_idx == 1:
+                    experience_q |= Q(required_yoe__gte=1, required_yoe__lte=4)
+                elif exp_idx == 2:
+                    experience_q |= Q(required_yoe__gte=4, required_yoe__lte=7)
+                elif exp_idx == 3:
+                    experience_q |= Q(required_yoe__gte=8)
+            jobs = jobs.filter(experience_q)
+        
+        if work_modes:
+            work_mode_q = Q()
+            for mode in work_modes:
+                work_mode_q |= Q(work_mode__iexact=mode)
+            jobs = jobs.filter(work_mode_q)
+        
+        if location_param:
+            jobs = jobs.filter(location__icontains=location_param)
+        
+        if required_skills:
+            for skill in required_skills:
+                jobs = jobs.filter(required_skills__icontains=skill)
+        
+        results = []
+        for job in jobs:
+            skills_list = [s.strip() for s in (job.required_skills or "").split(",") if s.strip()]
+            
+            results.append({
+                "id": job.id,
+                "title": job.job_title,
+                "company": job.company_email.company_name,
+                "description": job.description,
+                "workMode": job.work_mode,
+                "location": job.location,
+                "contactEmail": job.company_email.email,
+                "yoe": job.required_yoe,
+                "skills": skills_list,
+                "degree": job.required_degree,
+            })
+        
+        return JsonResponse({
+            "jobs": results,
+            "count": len(results),
+        }, status=200)
+        
+    except ValueError as e:
+        return JsonResponse({"error": "Invalid filter parameters"}, status=400)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
 
 
 @csrf_exempt
