@@ -1,68 +1,97 @@
 import { FC, FormEvent, KeyboardEvent, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useUserState } from "../providers/UserProvider";
 
 interface IProfilePageProps {}
 
 const candidatePreview = {
-  fullName: "John Doe",
-  email: "candidate1@example.com",
-  phone: "+65 9123 4567",
-  degree: "Computer Science",
+  fullName: "Candidate name",
+  email: "example@email.com",
+  phone: "04XXXXXXXX",
+  degree: "Degree name",
   university: "University of Wollongong",
-  experience: "2 years",
+  experience: "5",
   workExperience: "Backend internship and junior API development experience",
   preferredMode: "Hybrid",
   preferredLocation: "Wollongong",
   membership: "Premium",
-  skills: ["Python", "Django", "SQL", "Git", "REST APIs"],
+  skills: ["Skill 1", "Skill 2", "Skill 3"],
 };
 
 const companyPreview = {
-  companyName: "TechCorp",
-  email: "company1@example.com",
-  contact: "+65 6000 1111",
+  companyName: "Company name",
+  email: "example@email.com",
+  contact: "example@email.com",
   summary:
-    "A product-focused software company building internal tools and customer-facing platforms.",
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec consectetur libero tortor, ut lacinia dui tristique nec. Pellentesque sed lorem ut mauris facilisis aliquet. Vestibulum porttitor neque felis, in interdum leo efficitur sit amet. Sed efficitur consectetur turpis, eu lacinia eros maximus vel. Morbi orci nunc, sollicitudin sit amet egestas ac, ornare nec sem.",
   membership: "Premium",
   activeRoles: "4 open roles",
   hiringModes: "Remote, Hybrid, On-site",
   locations: "Wollongong",
   postedJobs: [
     {
-      title: "Junior Backend Developer",
-      companyInformation:
-        "A product-focused software company building internal tools and customer-facing platforms.",
+      title: "Job title",
+      companyInformation: "Company name",
       description:
-        "Build and maintain REST APIs, work with relational databases, and support deployment pipelines.",
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec consectetur libero tortor, ut lacinia dui tristique nec. Pellentesque sed lorem ut mauris facilisis aliquet. Vestibulum...",
       requiredEducation: "Computer Science",
       requiredSkills: "Python, Django, PostgreSQL, REST",
-      mode: "Hybrid",
-      location: "Wollongong",
+      mode: "Work mode",
+      location: "Location",
       experience: "1+ years",
     },
     {
-      title: "Frontend Engineer",
-      companyInformation:
-        "A product-focused software company building internal tools and customer-facing platforms.",
+      title: "Job title",
+      companyInformation: "Company name",
       description:
-        "Develop responsive interfaces, collaborate with designers, and maintain reusable components.",
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec consectetur libero tortor, ut lacinia dui tristique nec. Pellentesque sed lorem ut mauris facilisis aliquet. Vestibulum...",
       requiredEducation: "Information Systems",
       requiredSkills: "JavaScript, React, CSS, TypeScript",
-      mode: "Remote",
-      location: "Wollongong",
+      mode: "Work mode",
+      location: "Location",
       experience: "2+ years",
     },
     {
-      title: "Cloud Support Associate",
-      companyInformation:
-        "A product-focused software company building internal tools and customer-facing platforms.",
+      title: "Job title",
+      companyInformation: "Company name",
       description:
-        "Support cloud-hosted applications, troubleshoot issues, and document operational processes.",
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec consectetur libero tortor, ut lacinia dui tristique nec. Pellentesque sed lorem ut mauris facilisis aliquet. Vestibulum...",
       requiredEducation: "Computer Engineering",
       requiredSkills: "Linux, AWS, Networking, Scripting",
-      mode: "On-site",
-      location: "Wollongong",
+      mode: "Work mode",
+      location: "Location",
+      experience: "1+ years",
+    },
+    {
+      title: "Job title",
+      companyInformation: "Company name",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec consectetur libero tortor, ut lacinia dui tristique nec. Pellentesque sed lorem ut mauris facilisis aliquet. Vestibulum...",
+      requiredEducation: "Computer Engineering",
+      requiredSkills: "Linux, AWS, Networking, Scripting",
+      mode: "Work mode",
+      location: "Location",
+      experience: "1+ years",
+    },
+    {
+      title: "Job title",
+      companyInformation: "Company name",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec consectetur libero tortor, ut lacinia dui tristique nec. Pellentesque sed lorem ut mauris facilisis aliquet. Vestibulum...",
+      requiredEducation: "Computer Engineering",
+      requiredSkills: "Linux, AWS, Networking, Scripting",
+      mode: "Work mode",
+      location: "Location",
+      experience: "1+ years",
+    },
+    {
+      title: "Job title",
+      companyInformation: "Company name",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec consectetur libero tortor, ut lacinia dui tristique nec. Pellentesque sed lorem ut mauris facilisis aliquet. Vestibulum...",
+      requiredEducation: "Computer Engineering",
+      requiredSkills: "Linux, AWS, Networking, Scripting",
+      mode: "Work mode",
+      location: "Location",
       experience: "1+ years",
     },
   ],
@@ -268,172 +297,94 @@ function NewJobPostingModal({
 }
 
 function CandidateProfileCard() {
-  const navigate = useNavigate();
-
   return (
-    <>
-      <div className="page-header">
-        <div className="profile-header-row">
-          <div>
-            <span className="eyebrow">Candidate Profile</span>
-            <h1>{candidatePreview.fullName}</h1>
-          </div>
-          <button type="button" className="profile-back-button" onClick={() => navigate(-1)}>
-            Back
+    <section className="candidate-figma-shell">
+      <div className="candidate-figma-card">
+        <div className="candidate-figma-header">
+          <h1>{candidatePreview.fullName}</h1>
+          <button type="button" className="candidate-membership-button">
+            Buy membership
           </button>
         </div>
+        <div className="candidate-figma-details">
+          <div className="candidate-figma-field">
+            <h2>Email</h2>
+            <p>{candidatePreview.email}</p>
+          </div>
+          <div className="candidate-figma-field">
+            <h2>Phone</h2>
+            <p>{candidatePreview.phone}</p>
+          </div>
+          <div className="candidate-figma-field">
+            <h2>YOE</h2>
+            <p>{candidatePreview.experience}</p>
+          </div>
+          <div className="candidate-figma-field">
+            <h2>Degree name</h2>
+            <p>{candidatePreview.degree}</p>
+          </div>
+          <div className="candidate-figma-field">
+            <h2>University attended</h2>
+            <p>{candidatePreview.university}</p>
+          </div>
+          <div className="candidate-figma-field">
+            <h2>Skills</h2>
+            <p>{candidatePreview.skills.join(", ")}</p>
+          </div>
+        </div>
       </div>
-
-      <section className="profile-hero-grid">
-        <article className="profile-hero-card">
-          <span>Membership</span>
-          <strong>{candidatePreview.membership}</strong>
-          <p>Unlimited job recommendations available for this account.</p>
-        </article>
-        <article className="profile-hero-card">
-          <span>Years of Experience</span>
-          <strong>{candidatePreview.experience}</strong>
-          <p>{candidatePreview.degree}</p>
-        </article>
-        <article className="profile-hero-card">
-          <span>Preferred Working Mode</span>
-          <strong>{candidatePreview.preferredMode}</strong>
-          <p>{candidatePreview.preferredLocation}</p>
-        </article>
-      </section>
-
-      <section className="profile-grid">
-        <article className="profile-panel">
-          <h2>Profile Details</h2>
-          <div className="profile-detail-list">
-            <div>
-              <span>Email</span>
-              <strong>{candidatePreview.email}</strong>
-            </div>
-            <div>
-              <span>Phone</span>
-              <strong>{candidatePreview.phone}</strong>
-            </div>
-            <div>
-              <span>University</span>
-              <strong>{candidatePreview.university}</strong>
-            </div>
-            <div>
-              <span>Degree</span>
-              <strong>{candidatePreview.degree}</strong>
-            </div>
-            <div>
-              <span>Work Experience</span>
-              <strong>{candidatePreview.workExperience}</strong>
-            </div>
-          </div>
-        </article>
-
-        <article className="profile-panel">
-          <h2>Skills</h2>
-          <div className="profile-chip-list">
-            {candidatePreview.skills.map((skill) => (
-              <span key={skill} className="profile-chip">
-                {skill}
-              </span>
-            ))}
-          </div>
-        </article>
-      </section>
-    </>
+    </section>
   );
 }
 
 function CompanyProfileCard() {
-  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <>
       <NewJobPostingModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-
-      <div className="page-header">
-        <div className="profile-header-row">
-          <div>
-            <span className="eyebrow">Company Profile</span>
+      <section className="company-figma-shell">
+        <div className="company-figma-card">
+          <div className="company-figma-header">
             <h1>{companyPreview.companyName}</h1>
+            <button type="button" className="candidate-membership-button">
+              Buy membership
+            </button>
           </div>
-          <button type="button" className="profile-back-button" onClick={() => navigate(-1)}>
-            Back
-          </button>
-        </div>
-      </div>
 
-      <section className="profile-hero-grid">
-        <article className="profile-hero-card company">
-          <span>Membership</span>
-          <strong>{companyPreview.membership}</strong>
-          <p>Unlimited candidate recommendations available for recruiters.</p>
-        </article>
-        <article className="profile-hero-card company">
-          <span>Active Roles</span>
-          <strong>{companyPreview.activeRoles}</strong>
-          <p>{companyPreview.locations}</p>
-        </article>
-        <article className="profile-hero-card company">
-          <span>Work Modes</span>
-          <strong>{companyPreview.hiringModes}</strong>
-          <p>{companyPreview.locations}</p>
-        </article>
-      </section>
-
-      <section>
-        <article className="profile-panel">
-          <h2>Company Details</h2>
-          <div className="profile-detail-list">
-            <div>
-              <span>Email</span>
-              <strong>{companyPreview.email}</strong>
-            </div>
-            <div>
-              <span>Contact</span>
-              <strong>{companyPreview.contact}</strong>
-            </div>
-            <div>
-              <span>Primary Location</span>
-              <strong>{companyPreview.locations}</strong>
-            </div>
-            <div>
-              <span>About</span>
-              <strong>{companyPreview.summary}</strong>
-            </div>
+          <div className="company-figma-section">
+            <h2>Company information</h2>
+            <p>{companyPreview.summary}</p>
           </div>
-        </article>
-      </section>
 
-      <section className="profile-panel">
-        <div className="profile-section-header">
-          <h2>Posted Job Postings</h2>
-          <button
-            type="button"
-            className="profile-action-button"
-            onClick={() => setIsModalOpen(true)}
-          >
-            Add New Job Posting
-          </button>
-        </div>
-        <div className="profile-job-list">
-          {companyPreview.postedJobs.map((job) => (
-            <article key={job.title} className="profile-job-card">
-              <div className="profile-job-card-main">
-                <strong>{job.title}</strong>
-                <p>{job.companyInformation}</p>
-                <p>{job.description}</p>
-                <p>
-                  Required education: {job.requiredEducation}
+          <div className="company-figma-section">
+            <h2>Contact information</h2>
+            <p>{companyPreview.contact}</p>
+          </div>
+
+          <div className="company-postings-header">
+            <h2>Posted job postings</h2>
+            <button
+              type="button"
+              className="company-add-posting-button"
+              onClick={() => setIsModalOpen(true)}
+            >
+              Add job posting +
+            </button>
+          </div>
+
+          <div className="company-postings-list">
+            {companyPreview.postedJobs.map((job, index) => (
+              <article key={`${job.title}-${index}`} className="company-posting-card">
+                <h3>{job.title}</h3>
+                <p className="company-posting-company">{job.companyInformation}</p>
+                <p className="company-posting-description">{job.description}</p>
+                <p className="company-posting-meta">
+                  {job.mode} | {job.location}
                 </p>
-                <p>Required skills: {job.requiredSkills}</p>
-                <p>Years of experience: {job.experience}</p>
-                <p>Work mode: {job.mode}</p>
-                <p>Job location: {job.location}</p>
-              </div>
-            </article>
-          ))}
+              </article>
+            ))}
+          </div>
         </div>
       </section>
     </>
@@ -447,8 +398,8 @@ export const ProfilePage: FC<IProfilePageProps> = () => {
 
   return (
     <section className="page-shell">
-      <div className="page-card profile-page-card">
-        {isCompany ? <CompanyProfileCard /> : <CandidateProfileCard />}
+      <div className={`page-card profile-page-card ${isCompany ? "company-page-card" : "candidate-page-card"}`}>
+        {isCompany == false ? <CompanyProfileCard /> : <CandidateProfileCard />}
       </div>
     </section>
   );
