@@ -1,5 +1,4 @@
 import { FC, FormEvent, KeyboardEvent, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useUserState } from "../providers/UserProvider";
 
 interface IProfilePageProps {}
