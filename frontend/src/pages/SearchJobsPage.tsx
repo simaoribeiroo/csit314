@@ -195,7 +195,7 @@ const FilterPopup = forwardRef<IFilterPopupHandle, FilterPopupProps>((props, ref
 				<section className={styles.filterSection}>
 					<h3 className={styles.filterTitle}>Years of Experience</h3>
 					<div className={styles.checkboxGroup}>
-						{["No experience", "1-4 years", "4-7 years", "8+ years"].map((exp,i) => (
+						{["No experience", "1-4 years", "4-7 years", "8+ years"].map((exp, i) => (
 							<label key={exp} className={styles.checkboxLabel}>
 								<input
 									type="checkbox"
@@ -274,57 +274,7 @@ const FilterPopup = forwardRef<IFilterPopupHandle, FilterPopupProps>((props, ref
 });
 
 export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
-	const [jobs, setJobs] = useState<IJobPosting[]>([
-		{
-			id: 1,
-			title: "Job title 1",
-			company: "Company name",
-			description:
-				"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec consectetur libero tortor, ut lacinia dui tristique nec. Pellentesque sed lorem ut mauris facilisis aliquet. Vestibulum porttitor neque felis, in interdum leo efficitur sit amet. Sed efficitur consectetur turpis, eu lacinia eros maximus vel. Morbi orci nunc, sollicitudin sit amet egestas ac, ornare nec sem.",
-			workMode: "Hybrid",
-			location: "Sydney, Australia",
-			contactEmail: "example@email.com",
-			yoe: 5,
-			skills: ["React", "Tailwind", "HTML/CSS", "Typescript"],
-			degree: "Bachelor of Computer Science",
-		},
-		{
-			id: 2,
-			title: "Job title 2",
-			company: "Company name",
-			description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec consectetur libero tortor, ut lacinia dui tristique nec. Pellentesque sed lorem ut mauris facilisis aliquet. Vestibulum...",
-			workMode: "Work mode",
-			location: "Location",
-			contactEmail: "",
-			skills: [],
-			degree: "",
-			yoe: 0
-		},
-		{
-			id: 3,
-			title: "Job title 3",
-			company: "Company name",
-			description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec consectetur libero tortor, ut lacinia dui tristique nec. Pellentesque sed lorem ut mauris facilisis aliquet. Vestibulum...",
-			workMode: "Work mode",
-			location: "Location",
-			contactEmail: "",
-			skills: [],
-			degree: "",
-			yoe: 0
-		},
-		{
-			id: 4,
-			title: "Job title 4",
-			company: "Company name",
-			description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec consectetur libero tortor, ut lacinia dui tristique nec. Pellentesque sed lorem ut mauris facilisis aliquet. Vestibulum...",
-			workMode: "Work mode",
-			location: "Location",
-			contactEmail: "",
-			skills: [],
-			degree: "",
-			yoe: 0
-		},
-	]);
+	const [jobs, setJobs] = useState<IJobPosting[]>([]);
 	const jobDetailModal = useRef<IJobDetailModalHandle>(null);
 	const filtersModal = useRef<IFilterPopupHandle>(null);
 	const filters = useRef<IFilters>({
@@ -338,18 +288,18 @@ export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 	async function performSearch(searchString: string, searchFilters: IFilters) {
 		try {
 			const params = new URLSearchParams();
-			
+
 			if (searchString) params.append('search', searchString);
 			if (searchFilters.experience.length > 0) params.append('experience', searchFilters.experience.join(','));
 			if (searchFilters.workMode.length > 0) params.append('workMode', searchFilters.workMode.join(','));
 			if (searchFilters.skills.length > 0) params.append('skills', searchFilters.skills.join(','));
 			if (searchFilters.location) params.append('location', searchFilters.location);
-			
+
 			const response = await fetch(`/api/jobs/search/?${params}`);
 			if (!response.ok) {
 				throw new Error('Failed to search jobs');
 			}
-			
+
 			const data = await response.json();
 			setJobs(data.jobs || []);
 		} catch (error) {
@@ -358,10 +308,10 @@ export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 		}
 	}
 
-	function onSearch(e:React.SubmitEvent<HTMLFormElement>) {
+	function onSearch(e: React.SubmitEvent<HTMLFormElement>) {
 		e.preventDefault();
 		const formData = new FormData(e.currentTarget);
-        const data = Object.fromEntries(formData.entries()) as any;
+		const data = Object.fromEntries(formData.entries()) as any;
 		searchInput.current = data.search;
 		performSearch(data.search, filters.current);
 	}
@@ -396,6 +346,7 @@ export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 				</div>
 
 				<div className={styles.jobsList}>
+					{jobs.length == 0 ? <p className={styles.noResults}>No jobs found.</p> : ""}
 					{jobs.map((job) => (
 						<JobPostingCard
 							key={job.id}

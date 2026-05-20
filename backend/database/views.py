@@ -5,6 +5,7 @@ from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
 from django.db.models import Q
+from rapidfuzz import fuzz
 
 from .models import Account, Company, Candidate, JobPosting
 
@@ -86,7 +87,6 @@ def login(request):
         status=200,
     )
 
-
 @csrf_exempt
 @require_POST
 def register_account(request):
@@ -130,6 +130,138 @@ def register_account(request):
 
 @csrf_exempt
 @require_GET
+def search_candidates(request):
+    try:
+        search_string = request.GET.get("search", "").strip()
+        experience_param = request.GET.get("experience", "")
+        skills_param = request.GET.get("skills", "")
+        degree_param = request.GET.get("degree", "").strip()
+
+        experience_indices = [int(x.strip()) for x in experience_param.split(",") if x.strip().isdigit()]
+        skills = [x.strip() for x in skills_param.split(",") if x.strip()]
+        
+        candidates = Candidate.objects.all()
+        
+        if experience_indices:
+            experience_q = Q()
+            for exp_idx in experience_indices:
+                if exp_idx == 0:
+                    experience_q |= Q(years_of_experience=0)
+                elif exp_idx == 1:
+                    experience_q |= Q(years_of_experience__gte=1, years_of_experience__lte=4)
+                elif exp_idx == 2:
+                    experience_q |= Q(years_of_experience__gte=4, years_of_experience__lte=7)
+                elif exp_idx == 3:
+                    experience_q |= Q(years_of_experience__gte=8)
+            candidates = candidates.filter(experience_q)
+        
+        if degree_param:
+            candidates = candidates.filter(degree_name__icontains=degree_param)
+        
+        if skills:
+            for skill in skills:
+                candidates = candidates.filter(skills__icontains=skill)
+        
+        results = []
+        for candidate in candidates:
+            skills_list = [s.strip() for s in (candidate.skills or "").split(",") if s.strip()]
+            
+            results.append({
+                "email": candidate.email,
+                "name": candidate.full_name,
+                "phone": candidate.phone_number,
+                "prefferedWorkingMode": candidate.preferred_working_mode,
+                "location": candidate.preferred_location,
+                "yoe": candidate.years_of_experience,
+                "skills": skills_list,
+                "degree": candidate.degree_name,
+                "university": candidate.university,
+            })
+        
+        if search_string:
+            FUZZY_THRESHOLD = 70
+            
+            # add more synonyms later
+            SYNONYM_GROUPS = [
+                [
+                    "mei ling ng", 
+                    "meiling ng", 
+                    "may ling ng", 
+                    "mayling ng", 
+                    "ng mei ling", 
+                    "ng meiling", 
+                    "ms mei ling ng",
+                    "mrs mei ling ng"
+                ],
+                [
+                    "rafael costa", 
+                    "raphael costa", 
+                    "rafael da costa", 
+                    "raphael da costa", 
+                    "mr rafael costa", 
+                    "mr raphael costa",
+                    "rafaelcosta"
+                ],
+                [
+                    "ava tan", 
+                    "ava t.", 
+                    "ava t. tan", 
+                    "ms ava tan", 
+                    "miss ava tan", 
+                    "tan ava", 
+                    "avatan"
+                ]
+            ]
+            
+            search_lower = search_string.lower()
+            search_terms = [search_lower]
+            for group in SYNONYM_GROUPS:
+                for term in group:
+                    if fuzz.ratio(search_lower, term) > 80: 
+                        search_terms.extend(group)
+                        break
+            
+            search_terms = list(set(search_terms))
+            
+            results_with_scores = []
+            
+            for result in results:
+                name_lower = result["name"].lower()
+                
+                best_score_for_job = 0
+                
+                for term in search_terms:
+                    name_scores = [
+                        fuzz.ratio(term, name_lower),
+                        fuzz.partial_ratio(term, name_lower),
+                        fuzz.token_sort_ratio(term, name_lower),
+                        fuzz.token_set_ratio(term, name_lower),
+                    ]
+                    
+                    max_term_score = max(name_scores)
+                    if max_term_score > best_score_for_job:
+                        best_score_for_job = max_term_score
+                
+                if best_score_for_job >= FUZZY_THRESHOLD:
+                    results_with_scores.append((result, best_score_for_job))
+            
+            results_with_scores.sort(key=lambda x: x[1], reverse=True)
+            results = [result for result, score in results_with_scores]
+        
+        return JsonResponse({
+            "candidates": results,
+            "count": len(results),
+        }, status=200)
+        
+    except ValueError as e:
+        return JsonResponse({"error": "Invalid filter parameters"}, status=400)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+
+@csrf_exempt
+@require_GET
 def search_jobs(request):
     try:
         search_string = request.GET.get("search", "").strip()
@@ -143,12 +275,6 @@ def search_jobs(request):
         required_skills = [x.strip() for x in skills_param.split(",") if x.strip()]
         
         jobs = JobPosting.objects.all()
-        
-        if search_string:
-            jobs = jobs.filter(
-                Q(job_title__icontains=search_string) |
-                Q(description__icontains=search_string)
-            )
         
         if experience_indices:
             experience_q = Q()
@@ -192,6 +318,60 @@ def search_jobs(request):
                 "skills": skills_list,
                 "degree": job.required_degree,
             })
+        
+        if search_string:
+            FUZZY_THRESHOLD = 70
+            
+            # add more synonyms later
+            SYNONYM_GROUPS = [
+                ["software engineer", "programmer", "coder", "developer", "swe", "software developer"],
+                ["frontend", "front-end", "ui", "user interface", "react developer"],
+                ["backend", "back-end", "server-side", "api developer"],
+                ["data scientist", "machine learning engineer", "ml engineer", "data analyst"],
+            ]
+            
+            search_lower = search_string.lower()
+            search_terms = [search_lower]
+            for group in SYNONYM_GROUPS:
+                for term in group:
+                    if fuzz.ratio(search_lower, term) > 80: 
+                        search_terms.extend(group)
+                        break
+            
+            search_terms = list(set(search_terms))
+            
+            results_with_scores = []
+            
+            for result in results:
+                title_lower = result["title"].lower()
+                desc_lower = result["description"].lower()
+                
+                best_score_for_job = 0
+                
+                for term in search_terms:
+                    title_scores = [
+                        fuzz.ratio(term, title_lower),
+                        fuzz.partial_ratio(term, title_lower),
+                        fuzz.token_sort_ratio(term, title_lower),
+                        fuzz.token_set_ratio(term, title_lower),
+                    ]
+                    
+                    desc_scores = [
+                        fuzz.ratio(term, desc_lower),
+                        fuzz.partial_ratio(term, desc_lower),
+                        fuzz.token_sort_ratio(term, desc_lower),
+                        fuzz.token_set_ratio(term, desc_lower),
+                    ]
+                    
+                    max_term_score = max(max(title_scores), max(desc_scores))
+                    if max_term_score > best_score_for_job:
+                        best_score_for_job = max_term_score
+                
+                if best_score_for_job >= FUZZY_THRESHOLD:
+                    results_with_scores.append((result, best_score_for_job))
+            
+            results_with_scores.sort(key=lambda x: x[1], reverse=True)
+            results = [result for result, score in results_with_scores]
         
         return JsonResponse({
             "jobs": results,

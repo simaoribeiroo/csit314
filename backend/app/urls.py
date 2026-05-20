@@ -30,6 +30,7 @@ from database.views import (
     get_company_profile,
     get_candidate_profile,
     search_jobs,
+    search_candidates
 )
 
 def health(request):
@@ -46,6 +47,7 @@ urlpatterns = [
     path("api/company/<str:email>/", get_company_profile),
     path("api/candidate/<str:email>/", get_candidate_profile),
     path("api/jobs/search/", search_jobs),
+    path("api/candidates/search/", search_candidates),
 ]
 
 # Serve static files (both development and production)
