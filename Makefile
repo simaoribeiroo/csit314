@@ -26,7 +26,7 @@ backend-build:
 	.venv/bin/python backend/manage.py check
 
 unit:
-	docker compose exec -T -e PYTHONPATH=/app webapp python -m unittest discover -s /tests/unit -p "test_*.py"
+	docker compose exec -T -e PYTHONPATH=/app webapp python -m unittest discover -s /app/tests/unit -t /app -p "test_*.py"
 
 e2e:
 	npm --prefix tests/e2e install
