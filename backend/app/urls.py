@@ -16,8 +16,11 @@ Including another URLconf
 """
 
 from django.contrib import admin
+from django.views.static import serve
 from django.http import JsonResponse
-from django.urls import path
+from django.urls import path, re_path
+from django.views.generic import TemplateView
+from django.conf import settings
 
 from database.views import (
     login,
@@ -26,10 +29,13 @@ from database.views import (
     register_candidate,
     get_company_profile,
     get_candidate_profile,
+    search_jobs,
+    search_candidates
 )
 
 def health(request):
     return JsonResponse({"status": "ok"})
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -40,4 +46,18 @@ urlpatterns = [
     path("api/register-candidate/", register_candidate),
     path("api/company/<str:email>/", get_company_profile),
     path("api/candidate/<str:email>/", get_candidate_profile),
+    path("api/jobs/search/", search_jobs),
+    path("api/candidates/search/", search_candidates),
+]
+
+# Serve static files (both development and production)
+urlpatterns += [
+    re_path(r"^static/(?P<path>.*)$", serve, kwargs={"document_root": settings.STATIC_ROOT}),
+    re_path(r"^assets/(?P<path>.*)$", serve, kwargs={"document_root": settings.STATIC_ROOT / "assets"}),
+]
+
+# SPA catch-all routes - must be last
+urlpatterns += [
+    path("", TemplateView.as_view(template_name="index.html")),
+    re_path(r"^(?!api|static|assets)", TemplateView.as_view(template_name="index.html")),
 ]
