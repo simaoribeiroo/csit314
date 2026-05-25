@@ -333,6 +333,9 @@ export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 
 	function onSearchChange(value: string) {
 		setSearchQuery(value);
+	}
+
+	const [searchQuery, setSearchQuery] = useState<string>("");
 	const searchInput = useRef<string>("");
 
 	async function performSearch(searchString: string, searchFilters: IFilters) {
