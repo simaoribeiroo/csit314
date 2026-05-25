@@ -33,7 +33,7 @@ interface IJobPosting {
 }
 
 
-const jobDetailModal = useRef<IJobDetailModalHandle>(null);
+//const jobDetailModal = useRef<IJobDetailModalHandle>(null);
 
 const JobPostingCard: FC<{ job: IJobPosting; onClick: () => void }> = ({ job, onClick }) => {
 	return (
