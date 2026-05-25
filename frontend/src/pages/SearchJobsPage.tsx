@@ -32,6 +32,11 @@ interface IJobPosting {
 	degree: string;
 }
 
+const [jobs, setJobs] = useState<IJobPosting[]>([]);
+const [searchQuery, setSearchQuery] = useState("");
+
+const jobDetailModal = useRef<IJobDetailModalHandle>(null);
+
 const JobPostingCard: FC<{ job: IJobPosting; onClick: () => void }> = ({ job, onClick }) => {
 	return (
 		<div className={styles.jobCard} onClick={onClick}>
@@ -334,8 +339,6 @@ export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 	function onSearchChange(value: string) {
 		setSearchQuery(value);
 	}
-
-	const [searchQuery, setSearchQuery] = useState<string>("");
 	const searchInput = useRef<string>("");
 
 	async function performSearch(searchString: string, searchFilters: IFilters) {
@@ -413,3 +416,5 @@ export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 		</>
 	);
 };
+
+export default SearchJobsPage;
