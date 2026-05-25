@@ -1,9 +1,21 @@
-import { FC, forwardRef, useImperativeHandle, useRef, useState } from "react";
+import { FC, forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import styles from "../css/searchPage.module.css";
 import buttonStyles from "../css/baseButton.module.css";
 import { InputField, InputFieldHandle } from "../components/InputField";
 import { BaseButton } from "../components/BaseButton";
 import { Cross, Plus, Search } from "../components/Icons";
+
+type RecommendedJob = {
+  job_title: string;
+  company_name: string;
+  description: string;
+  work_mode: string;
+  required_yoe: number;
+  required_skills: string;
+  required_degree: string;
+  location: string;
+  score: number;
+};
 
 interface ISearchJobsPageProps { }
 
@@ -281,8 +293,46 @@ export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 		experience: [],
 		workMode: [],
 		skills: [],
-		location: ""
-	})
+		location: "",
+	});
+
+	useEffect(() => {
+		const email = localStorage.getItem("email");
+
+		if (!email) {
+			console.error("No logged-in email found");
+			return;
+		}
+
+		fetch(`http://127.0.0.1:8000/api/recommendations/jobs/?email=${email}`)
+			.then((response) => response.json())
+			.then((data) => {
+				const apiJobs: IJobPosting[] = (data.recommended_jobs || []).map(
+					(job: RecommendedJob, index: number) => ({
+						id: index + 1,
+						title: job.job_title,
+						company: job.company_name,
+						description: job.description,
+						workMode: job.work_mode,
+						location: job.location,
+						contactEmail: "",
+						yoe: job.required_yoe,
+						skills: job.required_skills
+							? job.required_skills.split(",").map((skill) => skill.trim())
+							: [],
+						degree: job.required_degree,
+					})
+				);
+
+				setJobs(apiJobs);
+			})
+			.catch((error) => {
+				console.error("Failed to load recommended jobs:", error);
+			});
+	}, []);
+
+	function onSearchChange(value: string) {
+		setSearchQuery(value);
 	const searchInput = useRef<string>("");
 
 	async function performSearch(searchString: string, searchFilters: IFilters) {
@@ -325,6 +375,7 @@ export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 		<>
 			<JobDetailModal ref={jobDetailModal} />
 			<FilterPopup onFiltersClose={onFiltersClose} ref={filtersModal} />
+
 			<div className={styles.container}>
 				<div className={styles.searchSection}>
 					<h1 className={styles.pageTitle}>Search jobs</h1>
