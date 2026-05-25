@@ -884,7 +884,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
 }
 
 .banner-brand {
@@ -893,6 +893,10 @@
   gap: 0;
   font-size: 1.5rem;
   font-weight: 700;
+}
+
+.banner-brand:hover{
+  cursor: pointer;
 }
 
 .banner-title {

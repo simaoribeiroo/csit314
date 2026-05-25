@@ -399,7 +399,7 @@ export const ProfilePage: FC<IProfilePageProps> = () => {
   return (
     <section className="page-shell">
       <div className={`page-card profile-page-card ${isCompany ? "company-page-card" : "candidate-page-card"}`}>
-        {isCompany == false ? <CompanyProfileCard /> : <CandidateProfileCard />}
+        {isCompany ? <CompanyProfileCard /> : <CandidateProfileCard />}
       </div>
     </section>
   );
