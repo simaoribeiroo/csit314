@@ -92,6 +92,8 @@
 .page-shell {
   display: grid;
   place-items: center;
+  width: 100%;
+  min-height: 100%;
 }
 
 .page-card {
@@ -240,6 +242,199 @@
 .profile-page-card {
   display: grid;
   gap: 24px;
+  width: 100%;
+}
+
+.candidate-page-card {
+  width: 100%;
+  max-width: 900px;
+  padding: 0;
+  border-radius: 0;
+  border: 0;
+  background: var(--tertiary);
+  box-shadow: none;
+  gap: 0;
+}
+
+.company-page-card {
+  width: 100%;
+  max-width: 900px;
+  min-height: 100%;
+  padding: 0;
+  border-radius: 0;
+  border: 0;
+  background: var(--tertiary);
+  box-shadow: none;
+  gap: 0;
+}
+
+.candidate-figma-shell {
+  width: 100%;
+}
+
+.candidate-figma-card {
+  min-height: calc(100dvh - 120px);
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+  background-color: var(--tertiary);
+  border-left: 1px solid var(--primary);
+  border-right: 1px solid var(--primary);
+  padding: 20px 20px 32px;
+  box-sizing: border-box;
+}
+
+.candidate-figma-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.candidate-figma-header h1 {
+  margin: 0;
+  color: var(--primary);
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.candidate-membership-button {
+  border: 0;
+  border-radius: 6px;
+  background: var(--primary);
+  color: var(--tertiary);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+.candidate-figma-details {
+  display: grid;
+  gap: 14px;
+}
+
+.candidate-figma-field h2 {
+  margin: 0 0 4px;
+  color: var(--primary);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.candidate-figma-field p {
+  margin: 0;
+  color: var(--primary);
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.company-figma-shell {
+  width: 100%;
+  min-height: 100%;
+}
+
+.company-figma-card {
+  min-height: calc(100dvh - 92px);
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+  background-color: var(--tertiary);
+  border-left: 1px solid var(--primary);
+  border-right: 1px solid var(--primary);
+  padding: 20px 20px 0;
+  box-sizing: border-box;
+}
+
+.company-figma-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.company-figma-header h1 {
+  margin: 0;
+  color: var(--primary);
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.company-figma-section {
+  margin-bottom: 14px;
+}
+
+.company-figma-section h2,
+.company-postings-header h2 {
+  margin: 0 0 4px;
+  color: var(--primary);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.company-figma-section p {
+  margin: 0;
+  color: var(--primary);
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.company-postings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin: 18px 0 0;
+  padding-bottom: 10px;
+}
+
+.company-add-posting-button {
+  border: 0;
+  border-radius: 6px;
+  background: var(--primary);
+  color: var(--tertiary);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+.company-postings-list {
+  border-top: 1px solid var(--primary);
+}
+
+.company-posting-card {
+  padding: 12px 0 14px;
+  border-bottom: 1px solid var(--primary);
+}
+
+.company-posting-card h3 {
+  margin: 0 0 4px;
+  color: var(--primary);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.company-posting-company,
+.company-posting-meta {
+  margin: 0;
+  color: var(--transluscent);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.company-posting-description {
+  margin: 10px 0;
+  color: var(--primary);
+  font-size: 14px;
+  line-height: 1.45;
 }
 
 .profile-back-button {
@@ -644,6 +839,17 @@
     align-items: stretch;
   }
 
+  .candidate-figma-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .company-figma-header,
+  .company-postings-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .profile-section-header {
     flex-direction: column;
     align-items: stretch;
@@ -678,7 +884,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
 }
 
 .banner-brand {
@@ -687,6 +893,10 @@
   gap: 0;
   font-size: 1.5rem;
   font-weight: 700;
+}
+
+.banner-brand:hover{
+  cursor: pointer;
 }
 
 .banner-title {
@@ -723,16 +933,18 @@
 
 /* Login Form Component */
 .login-container {
-  min-height: calc(100svh - 200px);
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 40px 20px;
 }
 
 .login-card {
   width: 100%;
   max-width: 380px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   border-radius: 24px;
   padding: 40px;
   background: #ffffff;
