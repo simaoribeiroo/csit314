@@ -16,17 +16,28 @@ Including another URLconf
 """
 
 from django.contrib import admin
+from django.views.static import serve
 from django.http import JsonResponse
-from django.urls import path
+from django.urls import path, re_path
+from django.views.generic import TemplateView
+from django.conf import settings
 
 from database.views import (
     login,
     recommended_jobs,
     recommended_candidates,
+    register_account,
+    register_company,
+    register_candidate,
+    get_company_profile,
+    get_candidate_profile,
+    search_jobs,
+    search_candidates
 )
 
 def health(request):
     return JsonResponse({"status": "ok"})
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),

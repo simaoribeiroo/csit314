@@ -1,25 +1,36 @@
 import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useUserState } from '../providers/UserProvider'
+import { useCompanyState } from '../providers/CompanyProvider'
+import { useUserRedirect, createConfirmPasswordHandler } from '../utils/forms'
+import AuthCard from './common/AuthCard'
+import PasswordField from './common/PasswordField'
+import FormField from './common/FormField'
 
 function CreateEmployerForm() {
   const navigate = useNavigate()
+  const userState = useUserState()
+  const companyState = useCompanyState()
   const confirmPasswordRef = useRef<HTMLInputElement>(null)
   const [companyName, setCompanyName] = useState('')
   const [email, setEmail] = useState('')
   const [companyInformation, setCompanyInformation] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
+  
+  const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setConfirmPassword(e.target.value)
-    if (confirmPasswordRef.current) {
-      confirmPasswordRef.current.setCustomValidity('')
-    }
-  }
+  useUserRedirect(navigate, userState)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleConfirmPasswordChange = createConfirmPasswordHandler(
+    setConfirmPassword,
+    confirmPasswordRef,
+  )
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError('')
     
     if (password !== confirmPassword) {
       if (confirmPasswordRef.current) {
@@ -33,120 +44,98 @@ function CreateEmployerForm() {
       confirmPasswordRef.current.setCustomValidity('')
     }
 
-    console.log('Create employer account:', {
-      companyName,
-      email,
-      companyInformation,
-      password,
-      confirmPassword,
-    })
-    navigate('/search-candidates')
+    setIsSubmitting(true)
+
+    try {
+      const accountResponse = await fetch('/api/register-account/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          account_type: 'company',
+        }),
+      })
+
+      const accountData = await accountResponse.json().catch(() => ({}))
+
+      if (!accountResponse.ok) {
+        setError(accountData.error ?? 'Unable to create account')
+        return
+      }
+
+      const companyResponse = await fetch('/api/register-company/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          company_name: companyName,
+          email,
+          company_information: companyInformation,
+        }),
+      })
+
+      const companyData = await companyResponse.json().catch(() => ({}))
+
+      if (!companyResponse.ok) {
+        setError(companyData.error ?? 'Unable to create company profile')
+        return
+      }
+
+      userState.setUser({
+        email: companyData.email ?? accountData.email ?? email,
+        accountType: companyData.account_type ?? accountData.account_type ?? 'company',
+      })
+      companyState.setCompany({
+        email: companyData.email ?? accountData.email ?? email,
+        companyName,
+        companyInformation,
+      })
+      navigate('/search-candidates')
+    } catch {
+      setError('Unable to reach the registration service')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
-    <div className="login-container employer-container">
-      <div className="login-card employer-card">
-        <h2 className="login-title">Create a company account</h2>
-
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="form-group">
-            <label htmlFor="company-name">Company name</label>
-            <input
-              id="company-name"
-              type="text"
-              placeholder="Company name"
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              type="email"
-              placeholder="example@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="company-information">Company information</label>
-            <textarea
-              id="company-information"
-              placeholder="Company information"
-              value={companyInformation}
-              onChange={(e) => setCompanyInformation(e.target.value)}
-              rows={4}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <div className="password-input-wrapper">
-              <input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <button
-                type="button"
-                className="password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? '✕' : '○'}
-              </button>
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="confirm-password">Confirm password</label>
-            <div className="password-input-wrapper">
-              <input
-                ref={confirmPasswordRef}
-                id="confirm-password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Confirm password"
-                value={confirmPassword}
-                onChange={handleConfirmPasswordChange}
-                required
-              />
-              <button
-                type="button"
-                className="password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? '✕' : '○'}
-              </button>
-            </div>
-          </div>
-
-          <button type="submit" className="login-button">
-            Create account
-          </button>
-        </form>
-
-        <div className="login-footer">
+    <AuthCard
+      containerClass="login-container"
+      cardClass="login-card employer-card"
+      title="Create a company account"
+      onSubmit={handleSubmit}
+      submitText={isSubmitting ? 'Creating account...' : 'Create account'}
+      isSubmitting={isSubmitting}
+      error={error}
+      footer={(
+        <>
           <span>Already have an account? </span>
-          <button
-            type="button"
-            className="login-footer-link"
-            onClick={() => navigate('/login')}
-          >
+          <button type="button" className="login-footer-link" onClick={() => navigate('/login')}>
             Login
           </button>
-        </div>
+        </>
+      )}
+    >
+      <FormField id="company-name" label="Company name" as="input" type="text" placeholder="Company name" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
+
+      <FormField id="email" label="Email" as="input" type="email" placeholder="example@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+
+      <FormField id="company-information" label="Company information" as="textarea" placeholder="Company information" value={companyInformation} onChange={(e) => setCompanyInformation(e.target.value)} rows={4} required />
+
+      <div className="form-group">
+        <label htmlFor="password">Password</label>
+        <PasswordField id="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
       </div>
-    </div>
+
+      <div className="form-group">
+        <label htmlFor="confirm-password">Confirm password</label>
+        <PasswordField ref={confirmPasswordRef} id="confirm-password" value={confirmPassword} onChange={handleConfirmPasswordChange} placeholder="Confirm password" required />
+      </div>
+    </AuthCard>
   )
 }
 

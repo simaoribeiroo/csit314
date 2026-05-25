@@ -7,9 +7,9 @@ interface ILayoutProps { };
 export const Layout: FC<ILayoutProps> = (_) => {
     return (
         <div className={styles.container}>
-            <Banner />
             <div className={styles.containerFullWindow}>
                 <div className={styles.containerMain}>
+                    <Banner />
                     <Outlet />
                     <ScrollRestoration />
                 </div>
