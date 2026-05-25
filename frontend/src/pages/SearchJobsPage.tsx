@@ -32,8 +32,6 @@ interface IJobPosting {
 	degree: string;
 }
 
-const [jobs, setJobs] = useState<IJobPosting[]>([]);
-const [searchQuery, setSearchQuery] = useState("");
 
 const jobDetailModal = useRef<IJobDetailModalHandle>(null);
 
@@ -292,6 +290,7 @@ const FilterPopup = forwardRef<IFilterPopupHandle, FilterPopupProps>((props, ref
 
 export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 	const [jobs, setJobs] = useState<IJobPosting[]>([]);
+	const [searchQuery, setSearchQuery] = useState("");
 	const jobDetailModal = useRef<IJobDetailModalHandle>(null);
 	const filtersModal = useRef<IFilterPopupHandle>(null);
 	const filters = useRef<IFilters>({
