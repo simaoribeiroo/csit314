@@ -290,46 +290,48 @@ export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 	const jobDetailModal = useRef<IJobDetailModalHandle>(null);
 	const filtersModal = useRef<IFilterPopupHandle>(null);
 	const [searchQuery, setSearchQuery] = useState("");
+
 	const filters = useRef<IFilters>({
 		experience: [],
 		workMode: [],
 		skills: [],
-		location: ""
-	})
+		location: "",
+	});
+
 	useEffect(() => {
-		const email = localStorage.getItem('email')
+		const email = localStorage.getItem("email");
 
 		if (!email) {
-		console.error('No logged-in email found')
-		return
+			console.error("No logged-in email found");
+			return;
 		}
 
 		fetch(`http://127.0.0.1:8000/api/recommendations/jobs/?email=${email}`)
 			.then((response) => response.json())
 			.then((data) => {
-			const apiJobs: IJobPosting[] = (data.recommended_jobs || []).map(
-				(job: RecommendedJob, index: number) => ({
-				id: index + 1,
-				title: job.job_title,
-				company: job.company_name,
-				description: job.description,
-				workMode: job.work_mode,
-				location: job.location,
-				contactEmail: "",
-				yoe: job.required_yoe,
-				skills: job.required_skills
-					? job.required_skills.split(",").map((skill) => skill.trim())
-					: [],
-				degree: job.required_degree,
-				})
-			);
+				const apiJobs: IJobPosting[] = (data.recommended_jobs || []).map(
+					(job: RecommendedJob, index: number) => ({
+						id: index + 1,
+						title: job.job_title,
+						company: job.company_name,
+						description: job.description,
+						workMode: job.work_mode,
+						location: job.location,
+						contactEmail: "",
+						yoe: job.required_yoe,
+						skills: job.required_skills
+							? job.required_skills.split(",").map((skill) => skill.trim())
+							: [],
+						degree: job.required_degree,
+					})
+				);
 
-			setJobs(apiJobs);
+				setJobs(apiJobs);
 			})
 			.catch((error) => {
-			console.error("Failed to load recommended jobs:", error);
+				console.error("Failed to load recommended jobs:", error);
 			});
-		}, []);
+	}, []);
 
 	function onSearchChange(value: string) {
 		setSearchQuery(value);
@@ -343,9 +345,11 @@ export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 		<>
 			<JobDetailModal ref={jobDetailModal} />
 			<FilterPopup onFiltersClose={onFiltersClose} ref={filtersModal} />
+
 			<div className={styles.container}>
 				<div className={styles.searchSection}>
 					<h1 className={styles.pageTitle}>Search jobs</h1>
+
 					<div className={styles.searchDiv}>
 						<InputField
 							type="text"
@@ -354,8 +358,13 @@ export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 							onChange={onSearchChange}
 							value={searchQuery}
 						/>
-						<BaseButton className={`${buttonStyles.primaryButton} ${styles.searchButton}`} icon={<Search />} />
+
+						<BaseButton
+							className={`${buttonStyles.primaryButton} ${styles.searchButton}`}
+							icon={<Search />}
+						/>
 					</div>
+
 					<BaseButton
 						className={styles.filtersButton}
 						onClick={() => filtersModal.current?.show(filters.current)}
