@@ -644,6 +644,7 @@ def get_company_profile(request, email):
             "email": company.email,
             "company_name": company.company_name,
             "company_information": company.company_information,
+            "is_member": company.is_member,
             "account_type": account.account_type,
         },
         status=200,
@@ -678,7 +679,69 @@ def get_candidate_profile(request, email):
             "skills": skills_list,
             "preferred_working_mode": candidate.preferred_working_mode,
             "preferred_location": candidate.preferred_location,
+            "is_member": candidate.is_member,
             "account_type": account.account_type,
         },
         status=200,
     )
+
+
+@csrf_exempt
+@require_POST
+def purchase_membership(request):
+    try:
+        payload = json.loads(request.body.decode("utf-8"))
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return JsonResponse({"error": "Invalid JSON payload"}, status=400)
+
+    email = payload.get("email")
+    account_type = payload.get("account_type")
+
+    if not email or not account_type:
+        return JsonResponse(
+            {"error": "email and account_type are required"},
+            status=400,
+        )
+
+    account = Account.objects.filter(email__iexact=email).first()
+    if account is None:
+        return JsonResponse({"error": "Account not found"}, status=404)
+
+    if account.account_type != account_type:
+        return JsonResponse({"error": "Account type mismatch"}, status=400)
+
+    if account_type == "candidate":
+        candidate = Candidate.objects.filter(email__iexact=email).first()
+        if candidate is None:
+            return JsonResponse({"error": "Candidate profile not found"}, status=404)
+
+        candidate.is_member = True
+        candidate.save(update_fields=["is_member"])
+        return JsonResponse(
+            {
+                "message": "Membership activated",
+                "email": candidate.email,
+                "account_type": account_type,
+                "is_member": candidate.is_member,
+            },
+            status=200,
+        )
+
+    if account_type == "company":
+        company = Company.objects.filter(email__iexact=email).first()
+        if company is None:
+            return JsonResponse({"error": "Company profile not found"}, status=404)
+
+        company.is_member = True
+        company.save(update_fields=["is_member"])
+        return JsonResponse(
+            {
+                "message": "Membership activated",
+                "email": company.email,
+                "account_type": account_type,
+                "is_member": company.is_member,
+            },
+            status=200,
+        )
+
+    return JsonResponse({"error": "Unsupported account_type"}, status=400)

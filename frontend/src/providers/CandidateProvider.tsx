@@ -14,6 +14,7 @@ export interface ICandidate {
     skills: string[];
     preferredWorkingMode: string;
     preferredLocation: string;
+    isMember: boolean;
 }
 
 interface ICandidateProviderInfo {
@@ -56,6 +57,7 @@ function getInitialCandidate(): ICandidate | undefined {
             skills,
             preferredWorkingMode: parsed.preferredWorkingMode ?? '',
             preferredLocation: parsed.preferredLocation ?? '',
+            isMember: parsed.isMember ?? false,
         };
     } catch {
         window.localStorage.removeItem(CANDIDATE_STORAGE_KEY);

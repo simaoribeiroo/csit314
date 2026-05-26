@@ -8,6 +8,7 @@ export interface ICompany {
     email: string;
     companyName: string;
     companyInformation: string;
+    isMember: boolean;
 }
 
 interface ICompanyProviderInfo {
@@ -43,6 +44,7 @@ function getInitialCompany(): ICompany | undefined {
             email: parsed.email,
             companyName: parsed.companyName,
             companyInformation: parsed.companyInformation,
+            isMember: parsed.isMember ?? false,
         };
     } catch {
         window.localStorage.removeItem(COMPANY_STORAGE_KEY);

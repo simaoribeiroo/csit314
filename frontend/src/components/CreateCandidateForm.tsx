@@ -127,6 +127,7 @@ function CreateCandidateForm() {
         skills,
         preferredWorkingMode,
         preferredLocation,
+        isMember: false,
       })
 
       navigate('/search-jobs')
