@@ -1,10 +1,18 @@
-import { FC, forwardRef, useImperativeHandle, useRef, useState } from "react";
+import { FC, forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import styles from "../css/searchPage.module.css";
 import buttonStyles from "../css/baseButton.module.css";
 import { InputField, InputFieldHandle } from "../components/InputField";
 import { BaseButton } from "../components/BaseButton";
 import { Cross, Plus, Search } from "../components/Icons";
 
+
+type RecommendedCandidate = {
+  email: string;
+  full_name: string;
+  skills: string;
+  years_of_experience: number;
+  score: number;
+};
 interface ISearchCandidatesPageProps { }
 
 interface ICandidatePosting {
@@ -247,7 +255,39 @@ const FilterPopup = forwardRef<IFilterPopupHandle, FilterPopupProps>((props, ref
 
 
 export const SearchCandidatesPage: FC<ISearchCandidatesPageProps> = (_) => {
-	const [candidates, setCandidates] = useState<ICandidatePosting[]>([])
+	const [candidates, setCandidates] = useState<ICandidatePosting[]>([]);
+		useEffect(() => {
+  const jobId = 1;
+
+  fetch(`http://127.0.0.1:8000/api/recommendations/candidates/?job_id=${jobId}`)
+    .then((response) => response.json())
+    .then((data) => {
+      const apiCandidates: ICandidatePosting[] =
+        (data.recommended_candidates || []).map(
+          (candidate: RecommendedCandidate, index: number) => ({
+            id: index + 1,
+            name: candidate.full_name,
+            email: candidate.email,
+            phone: "",
+            yoe: candidate.years_of_experience,
+            degree: "",
+            university: "",
+            skills: candidate.skills
+              ? candidate.skills.split(",").map((skill) => skill.trim())
+              : [],
+            prefferedWorkingMode: "",
+            location: "",
+          })
+        );
+
+      setCandidates(apiCandidates);
+    })
+    .catch((error) => {
+      console.error("Failed to load recommended candidates:", error);
+    });
+}, []);
+
+
 	const candidateDetailModal = useRef<ICandidateDetailModalHandle>(null);
 	const filtersModal = useRef<IFilterPopupHandle>(null);
 	const [selectedJobTitle, setSelectedJobTitle] = useState("Job title");
