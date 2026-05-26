@@ -7,7 +7,7 @@ from django.test import Client, SimpleTestCase, TestCase
 
 django.setup()
 
-from database.models import Account, Company, Candidate
+from database.models import Account, Company, Candidate, JobPosting
 
 
 class BackendHealthTest(SimpleTestCase):
@@ -425,6 +425,88 @@ class BackendRegisterCandidateTest(TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(response.content, {"error": "Invalid JSON payload"})
+
+
+class BackendCreateJobPostingTest(TestCase):
+    fixtures = ["dummy_data.json"]
+
+    def test_create_job_posting_success(self):
+        response = Client().post(
+            "/api/jobs/",
+            data={
+                "email": "company1@example.com",
+                "job_title": "Platform Engineer",
+                "description": "Build internal platform tooling.",
+                "work_mode": "Hybrid",
+                "required_yoe": 3,
+                "required_skills": ["Python", "Docker"],
+                "required_degree": "Computer Science",
+                "location": "Singapore",
+            },
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        payload = response.json()
+        self.assertEqual(payload["message"], "Job posting created successfully")
+        self.assertEqual(payload["job"]["title"], "Platform Engineer")
+        self.assertEqual(payload["job"]["company"], "TechCorp")
+        self.assertEqual(payload["job"]["contactEmail"], "company1@example.com")
+        self.assertEqual(payload["job"]["skills"], ["Python", "Docker"])
+        self.assertTrue(JobPosting.objects.filter(job_title="Platform Engineer").exists())
+
+    def test_create_job_posting_missing_fields(self):
+        response = Client().post(
+            "/api/jobs/",
+            data={"email": "company1@example.com"},
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(
+            response.content,
+            {
+                "error": "email, job_title, description, work_mode, required_yoe, required_skills, required_degree and location are required"
+            },
+        )
+
+    def test_create_job_posting_wrong_account_type(self):
+        response = Client().post(
+            "/api/jobs/",
+            data={
+                "email": "candidate1@example.com",
+                "job_title": "Platform Engineer",
+                "description": "Build internal platform tooling.",
+                "work_mode": "Hybrid",
+                "required_yoe": 3,
+                "required_skills": ["Python", "Docker"],
+                "required_degree": "Computer Science",
+                "location": "Singapore",
+            },
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(response.content, {"error": "Account type must be company"})
+
+    def test_create_job_posting_invalid_required_yoe(self):
+        response = Client().post(
+            "/api/jobs/",
+            data={
+                "email": "company1@example.com",
+                "job_title": "Platform Engineer",
+                "description": "Build internal platform tooling.",
+                "work_mode": "Hybrid",
+                "required_yoe": "abc",
+                "required_skills": ["Python", "Docker"],
+                "required_degree": "Computer Science",
+                "location": "Singapore",
+            },
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(response.content, {"error": "required_yoe must be an integer"})
 
 
 class BackendProfileTest(TestCase):

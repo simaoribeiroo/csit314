@@ -629,6 +629,94 @@ def register_candidate(request):
     )
 
 
+@csrf_exempt
+@require_POST
+def create_job_posting(request):
+    try:
+        payload = json.loads(request.body.decode("utf-8"))
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return JsonResponse({"error": "Invalid JSON payload"}, status=400)
+
+    email = payload.get("email")
+    job_title = payload.get("job_title")
+    description = payload.get("description")
+    work_mode = payload.get("work_mode")
+    required_yoe = payload.get("required_yoe")
+    required_skills = payload.get("required_skills")
+    required_degree = payload.get("required_degree")
+    location = payload.get("location")
+
+    if (
+        not email
+        or not job_title
+        or not description
+        or not work_mode
+        or required_yoe is None
+        or not required_skills
+        or not required_degree
+        or not location
+    ):
+        return JsonResponse(
+            {
+                "error": "email, job_title, description, work_mode, required_yoe, required_skills, required_degree and location are required"
+            },
+            status=400,
+        )
+
+    account = Account.objects.filter(email__iexact=email).first()
+    if account is None:
+        return JsonResponse({"error": "Account not found for this email"}, status=404)
+
+    if account.account_type != "company":
+        return JsonResponse({"error": "Account type must be company"}, status=400)
+
+    company = Company.objects.filter(email__iexact=email).first()
+    if company is None:
+        return JsonResponse({"error": "Company profile not found"}, status=404)
+
+    try:
+        yoe_value = int(required_yoe)
+    except (TypeError, ValueError):
+        return JsonResponse({"error": "required_yoe must be an integer"}, status=400)
+
+    if isinstance(required_skills, list):
+        skills_value = ",".join(
+            skill.strip() for skill in required_skills if isinstance(skill, str) and skill.strip()
+        )
+    else:
+        skills_value = str(required_skills).strip()
+
+    job = JobPosting.objects.create(
+        company_email=company,
+        job_title=job_title,
+        description=description,
+        work_mode=work_mode,
+        required_yoe=yoe_value,
+        required_skills=skills_value,
+        required_degree=required_degree,
+        location=location,
+    )
+
+    return JsonResponse(
+        {
+            "message": "Job posting created successfully",
+            "job": {
+                "id": job.id,
+                "title": job.job_title,
+                "company": company.company_name,
+                "description": job.description,
+                "workMode": job.work_mode,
+                "location": job.location,
+                "contactEmail": company.email,
+                "yoe": job.required_yoe,
+                "skills": [s.strip() for s in skills_value.split(",") if s.strip()],
+                "degree": job.required_degree,
+            },
+        },
+        status=201,
+    )
+
+
 @require_GET
 def get_company_profile(request, email):
     account = Account.objects.filter(email__iexact=email).first()
