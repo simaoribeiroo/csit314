@@ -8,8 +8,7 @@ run:
 	$(MAKE) compose-bootstrap
 	docker compose exec -T webapp python3 manage.py migrate
 	docker compose exec -T webapp python3 manage.py loaddata dummy_data
-	echo "Application is running at http://localhost:5173"
-	echo "Backend API is running at http://localhost:8001"
+	echo "Application is running at http://localhost:80"
 
 compose-bootstrap:
 	docker compose down --remove-orphans
