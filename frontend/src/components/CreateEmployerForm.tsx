@@ -93,6 +93,7 @@ function CreateEmployerForm() {
         email: companyData.email ?? accountData.email ?? email,
         companyName,
         companyInformation,
+        isMember: false,
       })
       navigate('/search-candidates')
     } catch {

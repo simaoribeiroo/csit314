@@ -440,6 +440,7 @@ class BackendProfileTest(TestCase):
                 "email": "company1@example.com",
                 "company_name": "TechCorp",
                 "company_information": "A product-focused software company building internal tools and customer-facing platforms.",
+                "is_member": False,
                 "account_type": "company",
             },
         )
@@ -477,6 +478,7 @@ class BackendProfileTest(TestCase):
                 "skills": ["Python", "Django", "SQL", "Git"],
                 "preferred_working_mode": "Hybrid",
                 "preferred_location": "Singapore",
+                "is_member": False,
                 "account_type": "candidate",
             },
         )

@@ -31,6 +31,7 @@ from database.views import (
     register_candidate,
     get_company_profile,
     get_candidate_profile,
+    purchase_membership,
     search_jobs,
     search_candidates
 )
@@ -48,6 +49,7 @@ urlpatterns = [
     path("api/register-account/", register_account),
     path("api/register-company/", register_company),
     path("api/register-candidate/", register_candidate),
+    path("api/membership/", purchase_membership),
     path("api/company/<str:email>/", get_company_profile),
     path("api/candidate/<str:email>/", get_candidate_profile),
     path("api/jobs/search/", search_jobs),

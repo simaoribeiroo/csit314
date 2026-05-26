@@ -223,6 +223,7 @@ function CandidateProfileCard() {
     storedCandidate?.email === user?.email ? storedCandidate : undefined,
   );
   const [isLoading, setIsLoading] = useState(Boolean(user?.email));
+  const [isBuyingMembership, setIsBuyingMembership] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -275,6 +276,7 @@ function CandidateProfileCard() {
               : [],
           preferredWorkingMode: data.preferred_working_mode ?? "",
           preferredLocation: data.preferred_location ?? "",
+          isMember: data.is_member ?? false,
         };
 
         candidateState.setCandidate(nextCandidate);
@@ -328,13 +330,64 @@ function CandidateProfileCard() {
     );
   }
 
+  async function handleBuyMembership() {
+    if (!candidate) {
+      return;
+    }
+
+    const currentCandidate = candidate;
+    setError("");
+    setIsBuyingMembership(true);
+
+    try {
+      const response = await fetch("/api/membership/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: currentCandidate.email,
+          account_type: "candidate",
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        setError(data.error ?? "Unable to activate membership.");
+        return;
+      }
+
+      const nextCandidate = {
+        ...currentCandidate,
+        isMember: true,
+      };
+
+      candidateState.setCandidate(nextCandidate);
+      setCandidate(nextCandidate);
+    } catch {
+      setError("Unable to activate membership.");
+    } finally {
+      setIsBuyingMembership(false);
+    }
+  }
+
   return (
     <section className="candidate-figma-shell">
       <div className="candidate-figma-card">
         <div className="candidate-figma-header">
           <h1>{candidate.fullName || "Candidate profile"}</h1>
-          <button type="button" className="candidate-membership-button">
-            Buy membership
+          <button
+            type="button"
+            className="candidate-membership-button"
+            onClick={handleBuyMembership}
+            disabled={candidate.isMember || isBuyingMembership}
+          >
+            {candidate.isMember
+              ? "Membership active"
+              : isBuyingMembership
+                ? "Activating..."
+                : "Buy membership"}
           </button>
         </div>
         <div className="candidate-figma-details">
@@ -370,6 +423,16 @@ function CandidateProfileCard() {
             <h2>Preferred location</h2>
             <p>{candidate.preferredLocation || "Not provided"}</p>
           </div>
+          <div className="candidate-figma-field">
+            <h2>Membership</h2>
+            <p>{candidate.isMember ? "Premium" : "Free"}</p>
+          </div>
+          {error ? (
+            <div className="candidate-figma-field">
+              <h2>Status</h2>
+              <p>{error}</p>
+            </div>
+          ) : null}
         </div>
       </div>
     </section>
@@ -391,6 +454,7 @@ function CompanyProfileCard() {
   );
   const [jobs, setJobs] = useState<ICompanyJobPosting[]>([]);
   const [isLoading, setIsLoading] = useState(Boolean(user?.email));
+  const [isBuyingMembership, setIsBuyingMembership] = useState(false);
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -442,6 +506,7 @@ function CompanyProfileCard() {
           email: companyData.email,
           companyName: companyData.company_name ?? "",
           companyInformation: companyData.company_information ?? "",
+          isMember: companyData.is_member ?? false,
         };
 
         const nextJobs: ICompanyJobPosting[] = Array.isArray(jobsData.jobs)
@@ -499,6 +564,48 @@ function CompanyProfileCard() {
     );
   }
 
+  async function handleBuyMembership() {
+    if (!company) {
+      return;
+    }
+
+    const currentCompany = company;
+    setError("");
+    setIsBuyingMembership(true);
+
+    try {
+      const response = await fetch("/api/membership/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: currentCompany.email,
+          account_type: "company",
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        setError(data.error ?? "Unable to activate membership.");
+        return;
+      }
+
+      const nextCompany = {
+        ...currentCompany,
+        isMember: true,
+      };
+
+      companyState.setCompany(nextCompany);
+      setCompany(nextCompany);
+    } catch {
+      setError("Unable to activate membership.");
+    } finally {
+      setIsBuyingMembership(false);
+    }
+  }
+
   return (
     <>
       <NewJobPostingModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
@@ -506,8 +613,17 @@ function CompanyProfileCard() {
         <div className="company-figma-card">
           <div className="company-figma-header">
             <h1>{company.companyName || "Company profile"}</h1>
-            <button type="button" className="candidate-membership-button">
-              Buy membership
+            <button
+              type="button"
+              className="candidate-membership-button"
+              onClick={handleBuyMembership}
+              disabled={company.isMember || isBuyingMembership}
+            >
+              {company.isMember
+                ? "Membership active"
+                : isBuyingMembership
+                  ? "Activating..."
+                  : "Buy membership"}
             </button>
           </div>
 
@@ -520,6 +636,16 @@ function CompanyProfileCard() {
             <h2>Contact information</h2>
             <p>{contactInformation || company.email}</p>
           </div>
+          <div className="company-figma-section">
+            <h2>Membership</h2>
+            <p>{company.isMember ? "Premium" : "Free"}</p>
+          </div>
+          {error ? (
+            <div className="company-figma-section">
+              <h2>Status</h2>
+              <p>{error}</p>
+            </div>
+          ) : null}
 
           <div className="company-postings-header">
             <h2>Posted job postings</h2>

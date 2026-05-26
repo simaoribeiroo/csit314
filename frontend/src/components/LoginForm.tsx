@@ -59,6 +59,7 @@ function LoginForm() {
               email: company.email,
               companyName: company.company_name ?? '',
               companyInformation: company.company_information ?? '',
+              isMember: company.is_member ?? false,
             })
           } else {
             companyState.setCompany(undefined)
@@ -96,6 +97,7 @@ function LoginForm() {
               skills,
               preferredWorkingMode: c.preferred_working_mode ?? '',
               preferredLocation: c.preferred_location ?? '',
+              isMember: c.is_member ?? false,
             })
           } else {
             candidateState.setCandidate(undefined)
