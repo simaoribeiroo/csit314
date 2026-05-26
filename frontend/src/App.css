@@ -91,7 +91,8 @@
 
 .page-shell {
   display: grid;
-  place-items: center;
+  place-items: start center;
+  align-content: start;
   width: 100%;
 }
 
@@ -247,6 +248,7 @@
 .candidate-page-card {
   width: 100%;
   max-width: 900px;
+  min-height: 100%;
   padding: 0;
   border-radius: 0;
   border: 0;
@@ -269,10 +271,11 @@
 
 .candidate-figma-shell {
   width: 100%;
+  min-height: 100%;
 }
 
 .candidate-figma-card {
-  min-height: calc(100dvh - 120px);
+  min-height: calc(100dvh - 92px);
   max-width: 900px;
   margin: 0 auto;
   width: 100%;
