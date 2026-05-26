@@ -7,6 +7,7 @@ export const Banner: FC<IBannerProps> = (_) => {
   let navigate = useNavigate();
   const userState = useUserState();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(userState.getUser() != undefined);
+  const isCompany = userState.getUser()?.accountType === "company";
 
   function onLogin() {
     setIsLoggedIn(true);
@@ -28,7 +29,7 @@ export const Banner: FC<IBannerProps> = (_) => {
   return (
     <div className="banner">
       <div className="banner-content">
-        <div className="banner-brand">
+        <div onClick={() => navigate(isCompany?"/search-candidates":'/search-jobs')} className="banner-brand">
           <span className="banner-title">Job</span>
           <span className="banner-title accent">Match</span>
         </div>

@@ -23,6 +23,7 @@ class Candidate(models.Model):
     skills = models.TextField()
     preferred_working_mode = models.CharField(max_length=100)
     preferred_location = models.CharField(max_length=255)
+    is_member = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'Candidate'
@@ -35,7 +36,8 @@ class Company(models.Model):
     email = models.EmailField(primary_key=True)
     company_name = models.CharField(max_length=255)
     company_information = models.TextField()
-    contact_information = models.CharField(max_length=255)
+    contact_information = models.CharField(max_length=255,default="")
+    is_member = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'Company'

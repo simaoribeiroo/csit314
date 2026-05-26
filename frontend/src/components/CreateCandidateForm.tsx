@@ -1,8 +1,16 @@
 import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useUserState } from '../providers/UserProvider'
+import { useCandidateState } from '../providers/CandidateProvider'
+import { useUserRedirect, createConfirmPasswordHandler } from '../utils/forms'
+import AuthCard from './common/AuthCard'
+import PasswordField from './common/PasswordField'
+import FormField from './common/FormField'
 
 function CreateCandidateForm() {
   const navigate = useNavigate()
+  const userState = useUserState()
+  const candidateState = useCandidateState()
   const confirmPasswordRef = useRef<HTMLInputElement>(null)
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
@@ -17,14 +25,16 @@ function CreateCandidateForm() {
   const [preferredLocation, setPreferredLocation] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
+  
+  const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setConfirmPassword(e.target.value)
-    if (confirmPasswordRef.current) {
-      confirmPasswordRef.current.setCustomValidity('')
-    }
-  }
+  useUserRedirect(navigate, userState)
+
+  const handleConfirmPasswordChange = createConfirmPasswordHandler(
+    setConfirmPassword,
+    confirmPasswordRef,
+  )
 
   const handleAddSkill = () => {
     const trimmedSkill = skillInput.trim()
@@ -47,8 +57,9 @@ function CreateCandidateForm() {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError('')
 
     if (password !== confirmPassword) {
       if (confirmPasswordRef.current) {
@@ -62,246 +73,139 @@ function CreateCandidateForm() {
       confirmPasswordRef.current.setCustomValidity('')
     }
 
-    console.log('Create candidate account:', {
-      firstName,
-      lastName,
-      email,
-      phoneNumber,
-      university,
-      degreeName,
-      yearsOfExperience,
-      skills,
-      preferredWorkingMode,
-      preferredLocation,
-      password,
-      confirmPassword,
-    })
-    navigate('/search-jobs')
+    setIsSubmitting(true)
+
+    try {
+      const accountResponse = await fetch('/api/register-account/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, account_type: 'candidate' }),
+      })
+
+      const accountData = await accountResponse.json().catch(() => ({}))
+
+      if (!accountResponse.ok) {
+        setError(accountData.error ?? 'Unable to create account')
+        return
+      }
+
+      const candidateResponse = await fetch('/api/register-candidate/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          full_name: `${firstName} ${lastName}`.trim(),
+          phone_number: phoneNumber,
+          university,
+          degree_name: degreeName,
+          years_of_experience: yearsOfExperience,
+          skills,
+          preferred_working_mode: preferredWorkingMode,
+          preferred_location: preferredLocation,
+        }),
+      })
+
+      const candidateData = await candidateResponse.json().catch(() => ({}))
+
+      if (!candidateResponse.ok) {
+        setError(candidateData.error ?? 'Unable to create candidate profile')
+        return
+      }
+
+      userState.setUser({
+        email: candidateData.email ?? accountData.email ?? email,
+        accountType: candidateData.account_type ?? accountData.account_type ?? 'candidate',
+      })
+
+      candidateState.setCandidate({
+        email: candidateData.email ?? accountData.email ?? email,
+        fullName: `${firstName} ${lastName}`.trim(),
+        phoneNumber,
+        university,
+        degreeName,
+        yearsOfExperience: Number(yearsOfExperience) || 0,
+        skills,
+        preferredWorkingMode,
+        preferredLocation,
+      })
+
+      navigate('/search-jobs')
+    } catch {
+      setError('Unable to reach the registration service')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
-    <div className="login-container candidate-container">
-      <div className="login-card candidate-card">
-        <h2 className="login-title">Create a candidate account</h2>
-
-        <form onSubmit={handleSubmit} className="login-form candidate-form">
-          <div className="candidate-grid two-column">
-            <div className="form-group">
-              <label htmlFor="first-name">First name</label>
-              <input
-                id="first-name"
-                type="text"
-                placeholder="First name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="last-name">Last name</label>
-              <input
-                id="last-name"
-                type="text"
-                placeholder="Last name"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="candidate-grid two-column">
-            <div className="form-group">
-              <label htmlFor="email">Email</label>
-              <input
-                id="email"
-                type="email"
-                placeholder="example@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="phone-number">Phone number</label>
-              <input
-                id="phone-number"
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]{10}"
-                placeholder="04XXXXXXXX"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                title="Phone number must contain exactly 10 digits"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="candidate-grid">
-            <div className="form-group">
-              <label htmlFor="university">University</label>
-              <input
-                id="university"
-                type="text"
-                placeholder="University"
-                value={university}
-                onChange={(e) => setUniversity(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="degree-name">Degree name</label>
-              <input
-                id="degree-name"
-                type="text"
-                placeholder="Degree name"
-                value={degreeName}
-                onChange={(e) => setDegreeName(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="candidate-grid">
-            <div className="form-group">
-              <label htmlFor="years-of-experience">Years of experience</label>
-              <input
-                id="years-of-experience"
-                type="number"
-                min="0"
-                step="1"
-                placeholder="i.e. 5"
-                value={yearsOfExperience}
-                onChange={(e) => setYearsOfExperience(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="skill-input">Skills</label>
-            <div className="skill-input-row">
-              <input
-                id="skill-input"
-                type="text"
-                placeholder="Skill"
-                value={skillInput}
-                onChange={(e) => setSkillInput(e.target.value)}
-                onKeyDown={handleSkillKeyDown}
-              />
-              <button type="button" className="skill-add-button" onClick={handleAddSkill} aria-label="Add skill">
-                +
-              </button>
-            </div>
-            <div className="skills-list">
-              {skills.map((skill, index) => (
-                <button
-                  key={`${skill}-${index}`}
-                  type="button"
-                  className="skill-chip"
-                  onClick={() => handleRemoveSkill(skill)}
-                  aria-label={`Remove ${skill}`}
-                >
-                  {skill}
-                  <span aria-hidden="true">×</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="candidate-grid two-column">
-            <div className="form-group">
-              <label htmlFor="preferred-working-mode">Preferred Working Mode</label>
-              <select
-                id="preferred-working-mode"
-                value={preferredWorkingMode}
-                onChange={(e) => setPreferredWorkingMode(e.target.value)}
-                required
-              >
-                <option value="" disabled>
-                  Select working mode
-                </option>
-                <option value="Remote">Remote</option>
-                <option value="On-site">On-site</option>
-                <option value="Hybrid">Hybrid</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="preferred-location">Preferred Location</label>
-              <input
-                id="preferred-location"
-                type="text"
-                placeholder="Preferred Location"
-                value={preferredLocation}
-                onChange={(e) => setPreferredLocation(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <div className="password-input-wrapper">
-              <input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <button
-                type="button"
-                className="password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? '✕' : '○'}
-              </button>
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="confirm-password">Confirm password</label>
-            <div className="password-input-wrapper">
-              <input
-                ref={confirmPasswordRef}
-                id="confirm-password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Confirm password"
-                value={confirmPassword}
-                onChange={handleConfirmPasswordChange}
-                required
-              />
-              <button
-                type="button"
-                className="password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? '✕' : '○'}
-              </button>
-            </div>
-          </div>
-
-          <button type="submit" className="login-button">
-            Create account
-          </button>
-        </form>
-
-        <div className="login-footer">
+    <AuthCard
+      containerClass="login-container"
+      cardClass="login-card candidate-card"
+      title="Create a candidate account"
+      onSubmit={handleSubmit}
+      submitText={isSubmitting ? 'Creating account...' : 'Create account'}
+      isSubmitting={isSubmitting}
+      error={error}
+      footer={(
+        <>
           <span>Already have an account? </span>
           <button type="button" className="login-footer-link" onClick={() => navigate('/login')}>
             Login
           </button>
-        </div>
+        </>
+      )}
+    >
+      <div className="candidate-grid two-column">
+        <FormField id="first-name" label="First name" as="input" type="text" placeholder="First name" value={firstName} onChange={(e) => setFirstName(e.target.value)} required className="" />
+
+        <FormField id="last-name" label="Last name" as="input" type="text" placeholder="Last name" value={lastName} onChange={(e) => setLastName(e.target.value)} required className="" />
       </div>
-    </div>
+
+      <div className="candidate-grid two-column">
+        <FormField id="email" label="Email" as="input" type="email" placeholder="example@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+
+        <FormField id="phone-number" label="Phone number" as="input" type="text" placeholder="04XXXXXXXX" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required />
+      </div>
+
+      <div className="candidate-grid">
+        <FormField id="university" label="University" as="input" type="text" placeholder="University" value={university} onChange={(e) => setUniversity(e.target.value)} required />
+
+        <FormField id="degree-name" label="Degree name" as="input" type="text" placeholder="Degree name" value={degreeName} onChange={(e) => setDegreeName(e.target.value)} required />
+      </div>
+
+      <div className="candidate-grid">
+        <FormField id="years-of-experience" label="Years of experience" as="input" type="number" placeholder="i.e. 5" value={yearsOfExperience} onChange={(e) => setYearsOfExperience(e.target.value)} required />
+      </div>
+
+      <FormField id="skill-input" label="Skills">
+        <div className="skill-input-row">
+          <input id="skill-input" type="text" placeholder="Skill" value={skillInput} onChange={(e) => setSkillInput(e.target.value)} onKeyDown={handleSkillKeyDown} />
+          <button type="button" className="skill-add-button" onClick={handleAddSkill} aria-label="Add skill">+</button>
+        </div>
+        <div className="skills-list">
+          {skills.map((skill, index) => (
+            <button key={`${skill}-${index}`} type="button" className="skill-chip" onClick={() => handleRemoveSkill(skill)} aria-label={`Remove ${skill}`}>
+              {skill}
+              <span aria-hidden="true">×</span>
+            </button>
+          ))}
+        </div>
+      </FormField>
+
+      <div className="candidate-grid two-column">
+        <FormField id="preferred-working-mode" label="Preferred Working Mode" as="select" value={preferredWorkingMode} onChange={(e) => setPreferredWorkingMode(e.target.value)} required options={[{ value: 'Remote', label: 'Remote' }, { value: 'On-site', label: 'On-site' }, { value: 'Hybrid', label: 'Hybrid' }]} placeholder="Select working mode" />
+
+        <FormField id="preferred-location" label="Preferred Location" as="input" type="text" placeholder="Preferred Location" value={preferredLocation} onChange={(e) => setPreferredLocation(e.target.value)} required />
+      </div>
+
+      <FormField id="password" label="Password">
+        <PasswordField id="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
+      </FormField>
+
+      <FormField id="confirm-password" label="Confirm password">
+        <PasswordField ref={confirmPasswordRef} id="confirm-password" value={confirmPassword} onChange={handleConfirmPasswordChange} placeholder="Confirm password" required />
+      </FormField>
+    </AuthCard>
   )
 }
 
