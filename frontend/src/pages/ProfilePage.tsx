@@ -1,101 +1,19 @@
-import { FC, FormEvent, KeyboardEvent, useState } from "react";
+import { FC, FormEvent, KeyboardEvent, useEffect, useState } from "react";
+import { useCandidateState, type ICandidate } from "../providers/CandidateProvider";
+import { useCompanyState } from "../providers/CompanyProvider";
 import { useUserState } from "../providers/UserProvider";
 
 interface IProfilePageProps {}
 
-const candidatePreview = {
-  fullName: "Candidate name",
-  email: "example@email.com",
-  phone: "04XXXXXXXX",
-  degree: "Degree name",
-  university: "University of Wollongong",
-  experience: "5",
-  workExperience: "Backend internship and junior API development experience",
-  preferredMode: "Hybrid",
-  preferredLocation: "Wollongong",
-  membership: "Premium",
-  skills: ["Skill 1", "Skill 2", "Skill 3"],
-};
-
-const companyPreview = {
-  companyName: "Company name",
-  email: "example@email.com",
-  contact: "example@email.com",
-  summary:
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec consectetur libero tortor, ut lacinia dui tristique nec. Pellentesque sed lorem ut mauris facilisis aliquet. Vestibulum porttitor neque felis, in interdum leo efficitur sit amet. Sed efficitur consectetur turpis, eu lacinia eros maximus vel. Morbi orci nunc, sollicitudin sit amet egestas ac, ornare nec sem.",
-  membership: "Premium",
-  activeRoles: "4 open roles",
-  hiringModes: "Remote, Hybrid, On-site",
-  locations: "Wollongong",
-  postedJobs: [
-    {
-      title: "Job title",
-      companyInformation: "Company name",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec consectetur libero tortor, ut lacinia dui tristique nec. Pellentesque sed lorem ut mauris facilisis aliquet. Vestibulum...",
-      requiredEducation: "Computer Science",
-      requiredSkills: "Python, Django, PostgreSQL, REST",
-      mode: "Work mode",
-      location: "Location",
-      experience: "1+ years",
-    },
-    {
-      title: "Job title",
-      companyInformation: "Company name",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec consectetur libero tortor, ut lacinia dui tristique nec. Pellentesque sed lorem ut mauris facilisis aliquet. Vestibulum...",
-      requiredEducation: "Information Systems",
-      requiredSkills: "JavaScript, React, CSS, TypeScript",
-      mode: "Work mode",
-      location: "Location",
-      experience: "2+ years",
-    },
-    {
-      title: "Job title",
-      companyInformation: "Company name",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec consectetur libero tortor, ut lacinia dui tristique nec. Pellentesque sed lorem ut mauris facilisis aliquet. Vestibulum...",
-      requiredEducation: "Computer Engineering",
-      requiredSkills: "Linux, AWS, Networking, Scripting",
-      mode: "Work mode",
-      location: "Location",
-      experience: "1+ years",
-    },
-    {
-      title: "Job title",
-      companyInformation: "Company name",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec consectetur libero tortor, ut lacinia dui tristique nec. Pellentesque sed lorem ut mauris facilisis aliquet. Vestibulum...",
-      requiredEducation: "Computer Engineering",
-      requiredSkills: "Linux, AWS, Networking, Scripting",
-      mode: "Work mode",
-      location: "Location",
-      experience: "1+ years",
-    },
-    {
-      title: "Job title",
-      companyInformation: "Company name",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec consectetur libero tortor, ut lacinia dui tristique nec. Pellentesque sed lorem ut mauris facilisis aliquet. Vestibulum...",
-      requiredEducation: "Computer Engineering",
-      requiredSkills: "Linux, AWS, Networking, Scripting",
-      mode: "Work mode",
-      location: "Location",
-      experience: "1+ years",
-    },
-    {
-      title: "Job title",
-      companyInformation: "Company name",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec consectetur libero tortor, ut lacinia dui tristique nec. Pellentesque sed lorem ut mauris facilisis aliquet. Vestibulum...",
-      requiredEducation: "Computer Engineering",
-      requiredSkills: "Linux, AWS, Networking, Scripting",
-      mode: "Work mode",
-      location: "Location",
-      experience: "1+ years",
-    },
-  ],
-};
+interface ICompanyJobPosting {
+  id: number;
+  title: string;
+  company: string;
+  description: string;
+  workMode: string;
+  location: string;
+  contactEmail: string;
+}
 
 function NewJobPostingModal({
   isOpen,
@@ -297,11 +215,124 @@ function NewJobPostingModal({
 }
 
 function CandidateProfileCard() {
+  const userState = useUserState();
+  const candidateState = useCandidateState();
+  const user = userState.getUser();
+  const storedCandidate = candidateState.getCandidate();
+  const [candidate, setCandidate] = useState<ICandidate | undefined>(
+    storedCandidate?.email === user?.email ? storedCandidate : undefined,
+  );
+  const [isLoading, setIsLoading] = useState(Boolean(user?.email));
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!user?.email) {
+      setCandidate(undefined);
+      setIsLoading(false);
+      setError("No logged-in candidate found.");
+      return;
+    }
+
+    if (user.accountType !== "candidate") {
+      setCandidate(undefined);
+      setIsLoading(false);
+      setError("This profile page is only available for candidate accounts.");
+      return;
+    }
+
+    let isActive = true;
+
+    setIsLoading(true);
+    setError("");
+
+    fetch(`/api/candidate/${encodeURIComponent(user.email)}/`)
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Unable to load candidate profile.");
+        }
+
+        return response.json();
+      })
+      .then((data) => {
+        if (!isActive) {
+          return;
+        }
+
+        const nextCandidate: ICandidate = {
+          email: data.email,
+          fullName: data.full_name ?? "",
+          phoneNumber: data.phone_number ?? "",
+          university: data.university ?? "",
+          degreeName: data.degree_name ?? "",
+          yearsOfExperience: Number(data.years_of_experience) || 0,
+          skills: Array.isArray(data.skills)
+            ? data.skills
+            : typeof data.skills === "string"
+              ? data.skills
+                  .split(",")
+                  .map((skill: string) => skill.trim())
+                  .filter(Boolean)
+              : [],
+          preferredWorkingMode: data.preferred_working_mode ?? "",
+          preferredLocation: data.preferred_location ?? "",
+        };
+
+        candidateState.setCandidate(nextCandidate);
+        setCandidate(nextCandidate);
+      })
+      .catch(() => {
+        if (!isActive) {
+          return;
+        }
+
+        setError("Unable to load candidate profile.");
+      })
+      .finally(() => {
+        if (isActive) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, [candidateState, user?.accountType, user?.email]);
+
+  if (isLoading) {
+    return (
+      <section className="candidate-figma-shell">
+        <div className="candidate-figma-card">
+          <div className="candidate-figma-header">
+            <h1>Loading profile...</h1>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error || !candidate) {
+    return (
+      <section className="candidate-figma-shell">
+        <div className="candidate-figma-card">
+          <div className="candidate-figma-header">
+            <h1>Candidate profile</h1>
+          </div>
+          <div className="candidate-figma-details">
+            <div className="candidate-figma-field">
+              <h2>Status</h2>
+              <p>{error || "Candidate profile not found."}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="candidate-figma-shell">
       <div className="candidate-figma-card">
         <div className="candidate-figma-header">
-          <h1>{candidatePreview.fullName}</h1>
+          <h1>{candidate.fullName || "Candidate profile"}</h1>
           <button type="button" className="candidate-membership-button">
             Buy membership
           </button>
@@ -309,27 +340,35 @@ function CandidateProfileCard() {
         <div className="candidate-figma-details">
           <div className="candidate-figma-field">
             <h2>Email</h2>
-            <p>{candidatePreview.email}</p>
+            <p>{candidate.email}</p>
           </div>
           <div className="candidate-figma-field">
             <h2>Phone</h2>
-            <p>{candidatePreview.phone}</p>
+            <p>{candidate.phoneNumber || "Not provided"}</p>
           </div>
           <div className="candidate-figma-field">
             <h2>YOE</h2>
-            <p>{candidatePreview.experience}</p>
+            <p>{candidate.yearsOfExperience}</p>
           </div>
           <div className="candidate-figma-field">
             <h2>Degree name</h2>
-            <p>{candidatePreview.degree}</p>
+            <p>{candidate.degreeName || "Not provided"}</p>
           </div>
           <div className="candidate-figma-field">
             <h2>University attended</h2>
-            <p>{candidatePreview.university}</p>
+            <p>{candidate.university || "Not provided"}</p>
           </div>
           <div className="candidate-figma-field">
             <h2>Skills</h2>
-            <p>{candidatePreview.skills.join(", ")}</p>
+            <p>{candidate.skills.length > 0 ? candidate.skills.join(", ") : "Not provided"}</p>
+          </div>
+          <div className="candidate-figma-field">
+            <h2>Preferred work mode</h2>
+            <p>{candidate.preferredWorkingMode || "Not provided"}</p>
+          </div>
+          <div className="candidate-figma-field">
+            <h2>Preferred location</h2>
+            <p>{candidate.preferredLocation || "Not provided"}</p>
           </div>
         </div>
       </div>
@@ -338,7 +377,127 @@ function CandidateProfileCard() {
 }
 
 function CompanyProfileCard() {
+  const userState = useUserState();
+  const companyState = useCompanyState();
+  const user = userState.getUser();
+  const storedCompany = companyState.getCompany();
+  const matchingStoredCompany =
+    storedCompany?.email === user?.email ? storedCompany : undefined;
+  const [company, setCompany] = useState(
+    matchingStoredCompany,
+  );
+  const [contactInformation, setContactInformation] = useState(
+    matchingStoredCompany?.email ?? "",
+  );
+  const [jobs, setJobs] = useState<ICompanyJobPosting[]>([]);
+  const [isLoading, setIsLoading] = useState(Boolean(user?.email));
+  const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!user?.email) {
+      setCompany(undefined);
+      setJobs([]);
+      setIsLoading(false);
+      setError("No logged-in company found.");
+      return;
+    }
+
+    if (user.accountType !== "company") {
+      setCompany(undefined);
+      setJobs([]);
+      setIsLoading(false);
+      setError("This profile page is only available for company accounts.");
+      return;
+    }
+
+    let isActive = true;
+
+    setIsLoading(true);
+    setError("");
+
+    Promise.all([
+      fetch(`/api/company/${encodeURIComponent(user.email)}/`),
+      fetch("/api/jobs/search/"),
+    ])
+      .then(async ([companyResponse, jobsResponse]) => {
+        if (!companyResponse.ok) {
+          throw new Error("Unable to load company profile.");
+        }
+
+        if (!jobsResponse.ok) {
+          throw new Error("Unable to load company job postings.");
+        }
+
+        const companyData = await companyResponse.json();
+        const jobsData = await jobsResponse.json();
+        return { companyData, jobsData };
+      })
+      .then(({ companyData, jobsData }) => {
+        if (!isActive) {
+          return;
+        }
+
+        const nextCompany = {
+          email: companyData.email,
+          companyName: companyData.company_name ?? "",
+          companyInformation: companyData.company_information ?? "",
+        };
+
+        const nextJobs: ICompanyJobPosting[] = Array.isArray(jobsData.jobs)
+          ? jobsData.jobs.filter((job: ICompanyJobPosting) => job.contactEmail === user.email)
+          : [];
+
+        companyState.setCompany(nextCompany);
+        setCompany(nextCompany);
+        setContactInformation(companyData.contact_information || companyData.email || "");
+        setJobs(nextJobs);
+      })
+      .catch(() => {
+        if (!isActive) {
+          return;
+        }
+
+        setError("Unable to load company profile.");
+      })
+      .finally(() => {
+        if (isActive) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, [companyState, user?.accountType, user?.email]);
+
+  if (isLoading) {
+    return (
+      <section className="company-figma-shell">
+        <div className="company-figma-card">
+          <div className="company-figma-header">
+            <h1>Loading profile...</h1>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error || !company) {
+    return (
+      <section className="company-figma-shell">
+        <div className="company-figma-card">
+          <div className="company-figma-header">
+            <h1>Company profile</h1>
+          </div>
+          <div className="company-figma-section">
+            <h2>Status</h2>
+            <p>{error || "Company profile not found."}</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <>
@@ -346,7 +505,7 @@ function CompanyProfileCard() {
       <section className="company-figma-shell">
         <div className="company-figma-card">
           <div className="company-figma-header">
-            <h1>{companyPreview.companyName}</h1>
+            <h1>{company.companyName || "Company profile"}</h1>
             <button type="button" className="candidate-membership-button">
               Buy membership
             </button>
@@ -354,12 +513,12 @@ function CompanyProfileCard() {
 
           <div className="company-figma-section">
             <h2>Company information</h2>
-            <p>{companyPreview.summary}</p>
+            <p>{company.companyInformation || "Not provided"}</p>
           </div>
 
           <div className="company-figma-section">
             <h2>Contact information</h2>
-            <p>{companyPreview.contact}</p>
+            <p>{contactInformation || company.email}</p>
           </div>
 
           <div className="company-postings-header">
@@ -374,16 +533,23 @@ function CompanyProfileCard() {
           </div>
 
           <div className="company-postings-list">
-            {companyPreview.postedJobs.map((job, index) => (
-              <article key={`${job.title}-${index}`} className="company-posting-card">
+            {jobs.length > 0 ? jobs.map((job) => (
+              <article key={job.id} className="company-posting-card">
                 <h3>{job.title}</h3>
-                <p className="company-posting-company">{job.companyInformation}</p>
+                <p className="company-posting-company">{job.company}</p>
                 <p className="company-posting-description">{job.description}</p>
                 <p className="company-posting-meta">
-                  {job.mode} | {job.location}
+                  {job.workMode} | {job.location}
                 </p>
               </article>
-            ))}
+            )) : (
+              <article className="company-posting-card">
+                <h3>No job postings yet</h3>
+                <p className="company-posting-description">
+                  This company does not have any posted jobs to show right now.
+                </p>
+              </article>
+            )}
           </div>
         </div>
       </section>
