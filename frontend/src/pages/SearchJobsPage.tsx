@@ -290,7 +290,6 @@ const FilterPopup = forwardRef<IFilterPopupHandle, FilterPopupProps>((props, ref
 
 export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 	const [jobs, setJobs] = useState<IJobPosting[]>([]);
-	const [searchQuery, setSearchQuery] = useState("");
 	const jobDetailModal = useRef<IJobDetailModalHandle>(null);
 	const filtersModal = useRef<IFilterPopupHandle>(null);
 	const filters = useRef<IFilters>({
@@ -308,7 +307,7 @@ export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 			return;
 		}
 
-		fetch(`http://127.0.0.1:8000/api/recommendations/jobs/?email=${email}`)
+		fetch(`/api/recommendations/jobs/?email=${email}`)
 			.then((response) => response.json())
 			.then((data) => {
 				const apiJobs: IJobPosting[] = (data.recommended_jobs || []).map(
@@ -335,9 +334,6 @@ export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 			});
 	}, []);
 
-	function onSearchChange(value: string) {
-		setSearchQuery(value);
-	}
 	const searchInput = useRef<string>("");
 
 	async function performSearch(searchString: string, searchFilters: IFilters) {

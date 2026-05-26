@@ -8,7 +8,6 @@ export const Banner: FC<IBannerProps> = (_) => {
   const userState = useUserState();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(userState.getUser() != undefined);
   const isCompany = userState.getUser()?.accountType === "company";
-  console.log(userState.getUser()?.accountType,isCompany)
 
   function onLogin() {
     setIsLoggedIn(true);

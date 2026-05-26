@@ -8,8 +8,8 @@ export const Layout: FC<ILayoutProps> = (_) => {
     return (
         <div className={styles.container}>
             <div className={styles.containerFullWindow}>
+                <Banner />
                 <div className={styles.containerMain}>
-                    <Banner />
                     <Outlet />
                     <ScrollRestoration />
                 </div>

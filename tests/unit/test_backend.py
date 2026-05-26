@@ -497,3 +497,123 @@ class BackendProfileTest(TestCase):
 
         self.assertEqual(response.status_code, 404)
         self.assertJSONEqual(response.content, {"error": "Candidate profile not found"})
+    
+    def test_search_jobs_with_filters(self):
+        response = Client().get("/api/jobs/search/?search=coder&experience=1&workMode=Hybrid&skills=React%2CC%2B%2B&location=Sydney")
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, {"jobs": [],"count":0})
+    
+    def test_search_candidates_with_filters(self):
+        response = Client().get("/api/candidates/search/?search=ava&experience=1&degree=Computer+Science")
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, {
+            "candidates": [
+                {
+                    "email": "candidate1@example.com",
+                    "name": "Ava Tan",
+                    "phone": "+65 9123 4567",
+                    "prefferedWorkingMode": "Hybrid",
+                    "location": "Singapore",
+                    "yoe": 2,
+                    "skills": [
+                        "Python",
+                        "Django",
+                        "SQL",
+                        "Git"
+                    ],
+                    "degree": "Computer Science",
+                    "university": "National University of Singapore"
+                }
+            ],
+            "count": 1
+        })
+    
+    def test_fuzzy_search_jobs(self):
+        response = Client().get("/api/jobs/search/?search=coder")
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, {
+            "jobs": [
+                {
+                    "id": 1,
+                    "title": "Junior Backend Developer",
+                    "company": "TechCorp",
+                    "description": "Build and maintain REST APIs, work with relational databases, and support deployment pipelines.",
+                    "workMode": "Hybrid",
+                    "location": "Singapore",
+                    "contactEmail": "company1@example.com",
+                    "yoe": 1,
+                    "skills": [
+                        "Python",
+                        "Django",
+                        "PostgreSQL",
+                        "REST"
+                    ],
+                    "degree": "Computer Science"
+                },
+                {
+                    "id": 2,
+                    "title": "Frontend Engineer",
+                    "company": "TechCorp",
+                    "description": "Develop responsive interfaces, collaborate with designers, and maintain reusable components.",
+                    "workMode": "Remote",
+                    "location": "Singapore",
+                    "contactEmail": "company1@example.com",
+                    "yoe": 2,
+                    "skills": [
+                        "JavaScript",
+                        "React",
+                        "CSS",
+                        "TypeScript"
+                    ],
+                    "degree": "Information Systems"
+                },
+                {
+                    "id": 3,
+                    "title": "Data Engineer",
+                    "company": "GreenWave Solutions",
+                    "description": "Design data pipelines, optimize warehouse models, and support analytics workflows.",
+                    "workMode": "On-site",
+                    "location": "Singapore",
+                    "contactEmail": "company2@example.com",
+                    "yoe": 3,
+                    "skills": [
+                        "SQL",
+                        "Python",
+                        "Airflow",
+                        "ETL"
+                    ],
+                    "degree": "Software Engineering"
+                }
+            ],
+            "count": 3
+        })
+    
+    def test_fuzzy_search_candidates(self):
+        response = Client().get("/api/candidates/search/?search=rfel")
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, {
+            "candidates": [
+                {
+                    "email": "candidate2@example.com",
+                    "name": "Rafael Costa",
+                    "phone": "+65 9888 1122",
+                    "prefferedWorkingMode": "Remote",
+                    "location": "Singapore",
+                    "yoe": 4,
+                    "skills": [
+                        "JavaScript",
+                        "React",
+                        "Node.js",
+                        "PostgreSQL"
+                    ],
+                    "degree": "Information Systems",
+                    "university": "Singapore Management University"
+                }
+            ],
+            "count": 1
+        })
+        
