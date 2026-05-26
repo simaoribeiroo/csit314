@@ -13,23 +13,34 @@ interface ICompanyJobPosting {
   workMode: string;
   location: string;
   contactEmail: string;
+  yoe?: number;
+  skills?: string[];
+  degree?: string;
 }
 
 function NewJobPostingModal({
   isOpen,
   onClose,
+  companyEmail,
+  companyName,
+  onJobCreated,
 }: {
   isOpen: boolean;
   onClose: () => void;
+  companyEmail: string;
+  companyName: string;
+  onJobCreated: (job: ICompanyJobPosting) => void;
 }) {
   const [jobTitle, setJobTitle] = useState("");
   const [description, setDescription] = useState("");
   const [workMode, setWorkMode] = useState("Hybrid");
   const [requiredYoe, setRequiredYoe] = useState("");
   const [skillInput, setSkillInput] = useState("");
-  const [skills, setSkills] = useState<string[]>(["Skill", "Skill", "Skill"]);
+  const [skills, setSkills] = useState<string[]>([]);
   const [requiredDegree, setRequiredDegree] = useState("");
   const [location, setLocation] = useState("");
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) {
     return null;
@@ -57,20 +68,64 @@ function NewJobPostingModal({
     }
   }
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    setError("");
+    setIsSubmitting(true);
 
-    console.log("New job posting preview:", {
-      jobTitle,
-      description,
-      workMode,
-      requiredYoe,
-      skills,
-      requiredDegree,
-      location,
-    });
+    try {
+      const response = await fetch("/api/jobs/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: companyEmail,
+          job_title: jobTitle,
+          description,
+          work_mode: workMode,
+          required_yoe: requiredYoe,
+          required_skills: skills,
+          required_degree: requiredDegree,
+          location,
+        }),
+      });
 
-    onClose();
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        setError(data.error ?? "Unable to create job posting.");
+        return;
+      }
+
+      const createdJob: ICompanyJobPosting = data.job ?? {
+        id: Date.now(),
+        title: jobTitle,
+        company: companyName,
+        description,
+        workMode,
+        location,
+        contactEmail: companyEmail,
+        yoe: Number(requiredYoe) || 0,
+        skills,
+        degree: requiredDegree,
+      };
+
+      onJobCreated(createdJob);
+      setJobTitle("");
+      setDescription("");
+      setWorkMode("Hybrid");
+      setRequiredYoe("");
+      setSkillInput("");
+      setSkills([]);
+      setRequiredDegree("");
+      setLocation("");
+      onClose();
+    } catch {
+      setError("Unable to create job posting.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -205,9 +260,10 @@ function NewJobPostingModal({
 
           <div className="profile-modal-actions">
             <button type="submit" className="profile-action-button">
-              Create job posting
+              {isSubmitting ? "Creating..." : "Create job posting"}
             </button>
           </div>
+          {error ? <p>{error}</p> : null}
         </form>
       </div>
     </div>
@@ -606,9 +662,19 @@ function CompanyProfileCard() {
     }
   }
 
+  function handleJobCreated(job: ICompanyJobPosting) {
+    setJobs((current) => [job, ...current]);
+  }
+
   return (
     <>
-      <NewJobPostingModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <NewJobPostingModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        companyEmail={company.email}
+        companyName={company.companyName}
+        onJobCreated={handleJobCreated}
+      />
       <section className="company-figma-shell">
         <div className="company-figma-card">
           <div className="company-figma-header">
