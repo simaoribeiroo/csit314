@@ -432,7 +432,7 @@ class BackendCreateJobPostingTest(TestCase):
 
     def test_create_job_posting_success(self):
         response = Client().post(
-            "/api/jobs/",
+            "/api/jobs/create/",
             data={
                 "email": "company1@example.com",
                 "job_title": "Platform Engineer",
@@ -457,7 +457,7 @@ class BackendCreateJobPostingTest(TestCase):
 
     def test_create_job_posting_missing_fields(self):
         response = Client().post(
-            "/api/jobs/",
+            "/api/jobs/create/",
             data={"email": "company1@example.com"},
             content_type="application/json",
         )
@@ -472,7 +472,7 @@ class BackendCreateJobPostingTest(TestCase):
 
     def test_create_job_posting_wrong_account_type(self):
         response = Client().post(
-            "/api/jobs/",
+            "/api/jobs/create/",
             data={
                 "email": "candidate1@example.com",
                 "job_title": "Platform Engineer",
@@ -491,7 +491,7 @@ class BackendCreateJobPostingTest(TestCase):
 
     def test_create_job_posting_invalid_required_yoe(self):
         response = Client().post(
-            "/api/jobs/",
+            "/api/jobs/create/",
             data={
                 "email": "company1@example.com",
                 "job_title": "Platform Engineer",
