@@ -288,7 +288,7 @@ export const SearchCandidatesPage: FC<ISearchCandidatesPageProps> = (_) => {
 }, []);
 
 	useEffect(() => {
-  fetch("http://127.0.0.1:8000/api/jobs/")
+  fetch("/api/jobs/")
     .then((response) => response.json())
     .then((data) => {
       setJobOptions(data || []);

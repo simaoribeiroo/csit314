@@ -74,7 +74,7 @@ function NewJobPostingModal({
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/jobs/", {
+      const response = await fetch("/api/jobs/create/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
