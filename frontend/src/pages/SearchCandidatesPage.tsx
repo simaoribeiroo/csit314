@@ -287,6 +287,17 @@ export const SearchCandidatesPage: FC<ISearchCandidatesPageProps> = (_) => {
     });
 }, []);
 
+	useEffect(() => {
+  fetch("http://127.0.0.1:8000/api/jobs/")
+    .then((response) => response.json())
+    .then((data) => {
+      setJobOptions(data || []);
+    })
+    .catch((error) => {
+      console.error("Failed to load jobs:", error);
+    });
+}, []);
+
 
 	const candidateDetailModal = useRef<ICandidateDetailModalHandle>(null);
 	const filtersModal = useRef<IFilterPopupHandle>(null);
@@ -296,7 +307,7 @@ export const SearchCandidatesPage: FC<ISearchCandidatesPageProps> = (_) => {
 		skills: [],
 		degree: ""
 	})
-	const jobTitles = ["Frontend Developer", "Backend Developer", "Full Stack Developer", "DevOps Engineer", "Data Scientist"];
+	const [jobOptions, setJobOptions] = useState<any[]>([]);
 	const searchInput = useRef<string>("");
 
 	async function performSearch(searchString: string, searchFilters: IFilters) {
@@ -362,9 +373,9 @@ export const SearchCandidatesPage: FC<ISearchCandidatesPageProps> = (_) => {
 								className={styles.jobTitleDropdown}
 								value={selectedJobTitle}
 								onChange={(e) => setSelectedJobTitle(e.target.value)}>
-								{jobTitles.map((title) => (
-									<option key={title} value={title}>
-										{title}
+								{jobOptions.map((job) => (
+									<option key={job.id} value={job.id}>
+										{job.job_title}
 									</option>
 								))}
 							</select>
