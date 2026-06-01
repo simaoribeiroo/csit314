@@ -22,6 +22,7 @@ from django.urls import path, re_path
 from django.views.generic import TemplateView
 from django.conf import settings
 
+from database.views import get_jobs
 from database.views import (
     login,
     recommended_jobs,
@@ -50,12 +51,13 @@ urlpatterns = [
     path("api/register-account/", register_account),
     path("api/register-company/", register_company),
     path("api/register-candidate/", register_candidate),
-    path("api/jobs/", create_job_posting),
+    path("api/jobs/create/", create_job_posting),
     path("api/membership/", purchase_membership),
     path("api/company/<str:email>/", get_company_profile),
     path("api/candidate/<str:email>/", get_candidate_profile),
     path("api/jobs/search/", search_jobs),
     path("api/candidates/search/", search_candidates),
+    path("api/jobs/", get_jobs),
 ]
 
 # Serve static files (both development and production)

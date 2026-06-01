@@ -524,7 +524,27 @@ def search_jobs(request):
         return JsonResponse({"error": "Invalid filter parameters"}, status=400)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+@csrf_exempt
+@require_GET
+def get_jobs(request):
+    jobs = JobPosting.objects.all()
 
+    data = []
+
+    for job in jobs:
+        data.append({
+            "id": job.id,
+            "job_title": job.job_title,
+            "company_name": job.company_email.company_name,
+            "description": job.description,
+            "work_mode": job.work_mode,
+            "required_yoe": job.required_yoe,
+            "required_skills": job.required_skills,
+            "required_degree": job.required_degree,
+            "location": job.location,
+        })
+
+    return JsonResponse(data, safe=False)
 
 @csrf_exempt
 @require_POST
