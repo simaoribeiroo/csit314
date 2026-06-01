@@ -253,14 +253,7 @@ const FilterPopup = forwardRef<IFilterPopupHandle, FilterPopupProps>((props, ref
 	);
 });
 
-	const candidateDetailModal = useRef<ICandidateDetailModalHandle>(null);
-	const filtersModal = useRef<IFilterPopupHandle>(null);
-	const [selectedJobTitle, setSelectedJobTitle] = useState("Job title");
-	const filters = useRef<IFilters>({
-		experience: [],
-		skills: [],
-		degree: ""
-	})
+	
 export const SearchCandidatesPage: FC<ISearchCandidatesPageProps> = (_) => {
 	const [candidates, setCandidates] = useState<ICandidatePosting[]>([]);
 		useEffect(() => {
@@ -295,7 +288,7 @@ export const SearchCandidatesPage: FC<ISearchCandidatesPageProps> = (_) => {
     .catch((error) => {
       console.error("Failed to load recommended candidates:", error);
     });
-}, [selectedJobTitle]);
+}, []);
 
 	useEffect(() => {
   fetch("/api/jobs/")
@@ -308,7 +301,14 @@ export const SearchCandidatesPage: FC<ISearchCandidatesPageProps> = (_) => {
     });
 }, []);
 
-
+	const candidateDetailModal = useRef<ICandidateDetailModalHandle>(null);
+	const filtersModal = useRef<IFilterPopupHandle>(null);
+	const [selectedJobTitle, setSelectedJobTitle] = useState("Job title");
+	const filters = useRef<IFilters>({
+		experience: [],
+		skills: [],
+		degree: ""
+	})
 	const [jobOptions, setJobOptions] = useState<any[]>([]);
 	const searchInput = useRef<string>("");
 
