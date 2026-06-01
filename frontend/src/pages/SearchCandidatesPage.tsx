@@ -291,7 +291,14 @@ export const SearchCandidatesPage: FC<ISearchCandidatesPageProps> = (_) => {
 }, []);
 
 	useEffect(() => {
-  fetch("/api/jobs/")
+  const companyEmail = localStorage.getItem("email");
+
+  if (!companyEmail) {
+    console.error("No logged-in company email found");
+    return;
+  }
+
+  fetch(`http://127.0.0.1:8000/api/company-jobs/?email=${companyEmail}`)
     .then((response) => response.json())
     .then((data) => {
       setJobOptions(data || []);
