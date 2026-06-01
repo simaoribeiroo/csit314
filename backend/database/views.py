@@ -736,6 +736,41 @@ def create_job_posting(request):
         status=201,
     )
 
+@require_GET
+def get_company_jobs(request):
+    email = request.GET.get("email")
+
+    if not email:
+        return JsonResponse(
+            {"error": "Company email is required"},
+            status=400
+        )
+
+    try:
+        company = Company.objects.get(email__iexact=email)
+    except Company.DoesNotExist:
+        return JsonResponse(
+            {"error": "Company not found"},
+            status=404
+        )
+
+    jobs = JobPosting.objects.filter(company_email=company)
+
+    data = []
+
+    for job in jobs:
+        data.append({
+            "id": job.id,
+            "job_title": job.job_title,
+            "description": job.description,
+            "work_mode": job.work_mode,
+            "required_yoe": job.required_yoe,
+            "required_skills": job.required_skills,
+            "required_degree": job.required_degree,
+            "location": job.location,
+        })
+
+    return JsonResponse(data, safe=False)
 
 @require_GET
 def get_company_profile(request, email):

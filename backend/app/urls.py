@@ -22,8 +22,9 @@ from django.urls import path, re_path
 from django.views.generic import TemplateView
 from django.conf import settings
 
-from database.views import get_jobs
+
 from database.views import (
+    get_jobs,
     login,
     recommended_jobs,
     recommended_candidates,
@@ -33,6 +34,7 @@ from database.views import (
     create_job_posting,
     get_company_profile,
     get_candidate_profile,
+    get_company_jobs,
     purchase_membership,
     search_jobs,
     search_candidates
@@ -53,6 +55,7 @@ urlpatterns = [
     path("api/register-candidate/", register_candidate),
     path("api/jobs/create/", create_job_posting),
     path("api/membership/", purchase_membership),
+    path("api/company-jobs/", get_company_jobs),
     path("api/company/<str:email>/", get_company_profile),
     path("api/candidate/<str:email>/", get_candidate_profile),
     path("api/jobs/search/", search_jobs),

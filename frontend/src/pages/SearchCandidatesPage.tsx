@@ -253,11 +253,21 @@ const FilterPopup = forwardRef<IFilterPopupHandle, FilterPopupProps>((props, ref
 	);
 });
 
-
+	const candidateDetailModal = useRef<ICandidateDetailModalHandle>(null);
+	const filtersModal = useRef<IFilterPopupHandle>(null);
+	const [selectedJobTitle, setSelectedJobTitle] = useState("Job title");
+	const filters = useRef<IFilters>({
+		experience: [],
+		skills: [],
+		degree: ""
+	})
 export const SearchCandidatesPage: FC<ISearchCandidatesPageProps> = (_) => {
 	const [candidates, setCandidates] = useState<ICandidatePosting[]>([]);
 		useEffect(() => {
-  const jobId = 1;
+  if(!selectedJobTitle) {
+	return;
+  }
+			const jobId = selectedJobTitle;
 
   fetch(`/api/recommendations/candidates/?job_id=${jobId}`)
     .then((response) => response.json())
@@ -285,28 +295,28 @@ export const SearchCandidatesPage: FC<ISearchCandidatesPageProps> = (_) => {
     .catch((error) => {
       console.error("Failed to load recommended candidates:", error);
     });
-}, []);
+}, [selectedJobTitle]);
 
 	useEffect(() => {
-  fetch("http://127.0.0.1:8000/api/jobs/")
+  const companyEmail = localStorage.getItem("email");
+
+  if (!companyEmail) {
+    console.error("No logged-in company email found");
+    return;
+  }
+
+
+  fetch(`http://127.0.0.1:8000/api/company-jobs/?email=${companyEmail}`)
     .then((response) => response.json())
     .then((data) => {
       setJobOptions(data || []);
     })
     .catch((error) => {
-      console.error("Failed to load jobs:", error);
+      console.error("Failed to load company jobs:", error);
     });
 }, []);
 
 
-	const candidateDetailModal = useRef<ICandidateDetailModalHandle>(null);
-	const filtersModal = useRef<IFilterPopupHandle>(null);
-	const [selectedJobTitle, setSelectedJobTitle] = useState("Job title");
-	const filters = useRef<IFilters>({
-		experience: [],
-		skills: [],
-		degree: ""
-	})
 	const [jobOptions, setJobOptions] = useState<any[]>([]);
 	const searchInput = useRef<string>("");
 
