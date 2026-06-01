@@ -4,6 +4,7 @@ import buttonStyles from "../css/baseButton.module.css";
 import { InputField, InputFieldHandle } from "../components/InputField";
 import { BaseButton } from "../components/BaseButton";
 import { Cross, Plus, Search } from "../components/Icons";
+import { useUserState } from "../providers/UserProvider";
 
 type RecommendedJob = {
   job_title: string;
@@ -292,6 +293,7 @@ export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 	const [jobs, setJobs] = useState<IJobPosting[]>([]);
 	const jobDetailModal = useRef<IJobDetailModalHandle>(null);
 	const filtersModal = useRef<IFilterPopupHandle>(null);
+	const userState=useUserState();
 	const filters = useRef<IFilters>({
 		experience: [],
 		workMode: [],
@@ -300,13 +302,7 @@ export const SearchJobsPage: FC<ISearchJobsPageProps> = (_) => {
 	});
 
 	useEffect(() => {
-		const email = localStorage.getItem("email");
-
-		if (!email) {
-			console.error("No logged-in email found");
-			return;
-		}
-
+		const email = userState?.getUser()?.email;
 		fetch(`/api/recommendations/jobs/?email=${email}`)
 			.then((response) => response.json())
 			.then((data) => {
