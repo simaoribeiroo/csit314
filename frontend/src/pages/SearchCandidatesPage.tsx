@@ -259,7 +259,7 @@ export const SearchCandidatesPage: FC<ISearchCandidatesPageProps> = (_) => {
 		useEffect(() => {
   const jobId = 1;
 
-  fetch(`http://127.0.0.1:8000/api/recommendations/candidates/?job_id=${jobId}`)
+  fetch(`/api/recommendations/candidates/?job_id=${jobId}`)
     .then((response) => response.json())
     .then((data) => {
       const apiCandidates: ICandidatePosting[] =
